@@ -1,0 +1,20 @@
+{
+    "private": true,
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build"
+    },
+    "devDependencies": {
+        "autoprefixer": "^10.4.20",
+        "axios": "^1.1.2",
+        "flowbite": "^2.5.2",
+        "laravel-vite-plugin": "^1.2.0",
+        "postcss": "^8.4.47",
+        "tailwindcss": "^3.4.13",
+        "vite": "^6.3.5"
+    },
+    "dependencies": {
+        "apexcharts": "^3.54.0",
+        "flowbite-typography": "^1.0.4"
+    }
+}
