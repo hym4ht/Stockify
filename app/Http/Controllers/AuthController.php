@@ -16,12 +16,22 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'role' => ['required', Rule::in(['Admin', 'Staff Gudang', 'Manajer Gudang'])],
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+                'password' => ['required', 'string', 'min:8', 'confirmed'],
+                'role' => ['required', Rule::in(['Admin', 'Staff Gudang', 'Manajer Gudang'])],
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $errors = $e->validator->errors();
+            if ($errors->has('password') && in_array('The password confirmation does not match.', $errors->get('password'))) {
+                return Redirect::back()
+                    ->withInput()
+                    ->with('error', 'Password and Confirm Password do not match.');
+            }
+            throw $e;
+        }
 
         $user = User::create([
             'name' => $validated['name'],
