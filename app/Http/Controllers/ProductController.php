@@ -64,5 +64,33 @@ class ProductController extends Controller
         return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully.');
     }
 
-    // Import and export methods will be added later
+    // Show import form
+    public function importForm()
+    {
+        return view('admin.products.import');
+    }
+
+    // Handle import POST request
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:csv,txt',
+        ]);
+
+        $this->productService->importProducts($request->file('file'));
+
+        return redirect()->route('admin.products.index')->with('success', 'Products imported successfully.');
+    }
+
+    // Export products as CSV
+    public function export()
+    {
+        $csv = $this->productService->exportProducts();
+
+        $filename = 'products_export_' . date('Ymd_His') . '.csv';
+
+        return response($csv)
+            ->header('Content-Type', 'text/csv')
+            ->header('Content-Disposition', "attachment; filename=\"$filename\"");
+    }
 }

@@ -2,6 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\StockController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SettingController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProductAttributeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +22,7 @@ use App\Http\Controllers\AuthController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
 Route::get('/', function () {
     return view('example.content.authentication.sign-in');
 })->name('login');
@@ -41,17 +51,7 @@ Route::get('/login', function () {
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\SupplierController;
-use App\Http\Controllers\StockController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\ReportController;
-use App\Http\Controllers\SettingController;
-
-Route::get('/admin/dashboard', function () {
-    return view('layouts.dashboard');
-})->name('admin.dashboard');
+Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
 Route::get('/dashboard', function () {
     return view('layouts.dashboard');
@@ -59,10 +59,14 @@ Route::get('/dashboard', function () {
 
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('products', ProductController::class);
+    Route::get('products/import', [ProductController::class, 'importForm'])->name('products.import.form');
+    Route::post('products/import', [ProductController::class, 'import'])->name('products.import');
+    Route::get('products/export', [ProductController::class, 'export'])->name('products.export');
     Route::resource('categories', CategoryController::class);
     Route::resource('suppliers', SupplierController::class);
     Route::resource('stock', StockController::class)->only(['index', 'create', 'store']);
     Route::resource('users', UserController::class);
+    Route::resource('product_attributes', ProductAttributeController::class);
     Route::get('reports/stock', [ReportController::class, 'stockReport'])->name('reports.stock');
     Route::get('reports/transactions', [ReportController::class, 'transactionReport'])->name('reports.transactions');
     Route::get('reports/user-activity', [ReportController::class, 'userActivityReport'])->name('reports.user_activity');

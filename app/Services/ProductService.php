@@ -40,6 +40,49 @@ class ProductService
         return $this->productRepository->delete($product);
     }
 
+    public function importProducts($file)
+    {
+        $path = $file->getRealPath();
+        $data = array_map('str_getcsv', file($path));
+        $header = array_map('strtolower', array_shift($data));
+
+        foreach ($data as $row) {
+            $rowData = array_combine($header, $row);
+
+            // Validate and create or update product
+            try {
+                $this->validate($rowData);
+                $existingProduct = $this->productRepository->findBySku($rowData['sku'] ?? null);
+                if ($existingProduct) {
+                    $this->updateProduct($existingProduct, $rowData);
+                } else {
+                    $this->createProduct($rowData);
+                }
+            } catch (ValidationException $e) {
+                // Skip invalid rows or handle errors as needed
+                continue;
+            }
+        }
+    }
+
+    public function exportProducts()
+    {
+        $products = $this->productRepository->getAll();
+
+        $header = ['name', 'category_id', 'supplier_id', 'sku', 'description', 'price', 'stock'];
+        $csv = implode(',', $header) . "\n";
+
+        foreach ($products as $product) {
+            $row = [];
+            foreach ($header as $field) {
+                $row[] = '"' . str_replace('"', '""', $product->$field) . '"';
+            }
+            $csv .= implode(',', $row) . "\n";
+        }
+
+        return $csv;
+    }
+
     protected function validate(array $data, int $productId = null)
     {
         $rules = [

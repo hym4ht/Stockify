@@ -11,6 +11,19 @@ class ProductRepository
         return Product::with(['category', 'supplier'])->paginate($perPage);
     }
 
+    public function getAll()
+    {
+        return Product::all();
+    }
+
+    public function findBySku(?string $sku)
+    {
+        if (!$sku) {
+            return null;
+        }
+        return Product::where('sku', $sku)->first();
+    }
+
     public function findById(int $id): ?Product
     {
         return Product::find($id);
