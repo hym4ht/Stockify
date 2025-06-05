@@ -68,6 +68,9 @@ class DashboardController extends Controller
                 }
             }
 
+            // Fetch stock summary for sidebar report
+            $stockSummary = Product::select('name', 'stock')->orderBy('name')->get();
+
             return view('admin.dashboard', compact(
                 'productCount',
                 'transactionsInCount',
@@ -77,7 +80,8 @@ class DashboardController extends Controller
                 'endDate',
                 'dates',
                 'stockInData',
-                'stockOutData'
+                'stockOutData',
+                'stockSummary'
             ));
         } elseif ($user->role === 'Staff Gudang') {
             // Staf Gudang dashboard data with pending tasks

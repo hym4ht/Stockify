@@ -24,6 +24,15 @@ class ProductRepository
         return Product::where('sku', $sku)->first();
     }
 
+    public function search(string $query, int $perPage = 15)
+    {
+        return Product::with(['category', 'supplier'])
+            ->where('name', 'like', '%' . $query . '%')
+            ->orWhere('sku', 'like', '%' . $query . '%')
+            ->orWhere('description', 'like', '%' . $query . '%')
+            ->paginate($perPage);
+    }
+
     public function findById(int $id): ?Product
     {
         return Product::find($id);

@@ -4,7 +4,7 @@
     <div class="p-6">
         <h1 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Admin Dashboard</h1>
         <p>Selamat datang di dashboard Admin. Di sini Anda dapat mengelola produk, stok, pengguna, dan laporan.</p>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
                 <h2 class="text-lg font-medium text-gray-700 dark:text-gray-300">Total Products</h2>
                 <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ $productCount }}</p>
@@ -17,21 +17,22 @@
                 <h2 class="text-lg font-medium text-gray-700 dark:text-gray-300">Transactions Out ({{ $startDate }} - {{ $endDate }})</h2>
                 <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ $transactionsOutCount }}</p>
             </div>
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
-                <div class="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
-                    <h2 class="text-lg font-medium text-gray-700 dark:text-gray-300">Stock Graph</h2>
-                </div>
-                <div class="p-4">
-                    <canvas id="stockChart" class="w-full h-48"></canvas>
-                    <div class="mt-2 flex space-x-4 text-sm font-medium text-gray-600 dark:text-gray-300">
-                        <div class="flex items-center space-x-1">
-                            <span class="block w-4 h-4 bg-green-500 rounded"></span>
-                            <span>Stock In</span>
-                        </div>
-                        <div class="flex items-center space-x-1">
-                            <span class="block w-4 h-4 bg-red-500 rounded"></span>
-                            <span>Stock Out</span>
-                        </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6">
+            <div class="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+                <h2 class="text-lg font-medium text-gray-700 dark:text-gray-300">Stock Graph</h2>
+            </div>
+            <div class="p-4">
+                <canvas id="stockChart" class="w-full h-96"></canvas>
+                <div class="mt-2 flex space-x-4 text-sm font-medium text-gray-600 dark:text-gray-300">
+                    <div class="flex items-center space-x-1">
+                        <span class="block w-4 h-4 bg-green-500 rounded"></span>
+                        <span>Stock In</span>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <span class="block w-4 h-4 bg-red-500 rounded"></span>
+                        <span>Stock Out</span>
                     </div>
                 </div>
             </div>
@@ -113,32 +114,32 @@
                         }
                     ]
                 },
-            options: {
-                responsive: true,
-                interaction: {
-                    mode: 'nearest',
-                    intersect: false
-                },
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        enabled: true,
-                        mode: 'index',
+                options: {
+                    responsive: true,
+                    interaction: {
+                        mode: 'nearest',
                         intersect: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            enabled: true,
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
                         }
                     }
                 }
-            }
-        });
-    </script>
-</div>
+            });
+        </script>
+    </div>
 @endsection

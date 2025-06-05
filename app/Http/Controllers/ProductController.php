@@ -17,10 +17,15 @@ class ProductController extends Controller
     }
 
     // Display a listing of products
-    public function index()
+    public function index(Request $request)
     {
-        $products = $this->productService->listProducts();
-        return view('admin.products.index', compact('products'));
+        $query = $request->input('query');
+        if ($query) {
+            $products = $this->productService->searchProducts($query);
+        } else {
+            $products = $this->productService->listProducts();
+        }
+        return view('admin.products.index', compact('products', 'query'));
     }
 
     // Show the form for creating a new product

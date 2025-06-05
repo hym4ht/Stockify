@@ -67,12 +67,16 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('suppliers', SupplierController::class);
     Route::resource('stock', StockController::class);
     Route::resource('users', UserController::class);
+    Route::get('users', [UserController::class, 'index'])->name('users.index');
     Route::resource('product_attributes', ProductAttributeController::class);
     Route::get('reports/stock', [ReportController::class, 'stockReport'])->name('reports.stock');
     Route::get('reports/transactions', [ReportController::class, 'transactionReport'])->name('reports.transactions');
     Route::get('reports/user-activity', [ReportController::class, 'userActivityReport'])->name('reports.user_activity');
     Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
+    
+    
+
 });
 
 // Route for staf gudang to confirm stock transactions

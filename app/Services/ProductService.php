@@ -21,6 +21,11 @@ class ProductService
         return $this->productRepository->getAllPaginated($perPage);
     }
 
+    public function searchProducts(string $query, int $perPage = 15)
+    {
+        return $this->productRepository->search($query, $perPage);
+    }
+
     public function createProduct(array $data): Product
     {
         $this->validate($data);
