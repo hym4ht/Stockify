@@ -2,7 +2,7 @@
     <div class="container px-4 mx-auto xl:px-0">
         <div class="grid gap-12 xl:grid-cols-6 xl:gap-24">
             <div class="col-span-2">
-                <a href="{{ url('/') }}" class="flex mr-4">
+                <a href="{{ url('#') }}" class="flex mr-4">
                     <img src="{{ asset('static/images/logo.svg') }}" class="h-8 mr-3" alt="Flowbite Logo" />
                     <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Stockify</span>
                   </a>
@@ -44,10 +44,10 @@
                 <h3 class="mb-6 text-sm font-semibold text-gray-600 uppercase dark:text-white">Follow us</h3>
                 <ul>
                     <li class="mb-4">
-                        <a href="https://github.com/themesberg" target="_blank" rel="noreferrer" class="font-normal text-gray-600 hover:underline dark:text-gray-400">Github</a>
+                        <a href="https://github.com/themesberg" target="_blank" rel="noreferrer" class="font-normal text-gray-600 hover:underline dark:text-gray-400">Instagram</a>
                     </li>
                     <li class="mb-4">
-                        <a href="https://twitter.com/zoltanszogyenyi" target="_blank" rel="noreferrer" class="font-normal text-gray-600 hover:underline dark:text-gray-400">Twitter</a>
+                        <a href="https://twitter.com/zoltanszogyenyi" target="_blank" rel="noreferrer" class="font-normal text-gray-600 hover:underline dark:text-gray-400">Tiktok</a>
                     </li>
                     <li class="mb-4">
                         <a href="https://www.facebook.com/themesberg" target="_blank" rel="noreferrer" class="font-normal text-gray-600 hover:underline dark:text-gray-400">Facebook</a>

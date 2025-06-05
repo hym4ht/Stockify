@@ -12,69 +12,89 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        // Get total product count
-        $productCount = Product::count();
+        // Since role-based access is handled by middleware, no need to check role here
+        // You can customize dashboard data per role if needed by separate controllers or views
 
-        // Define period for transactions (default last 30 days)
-        $startDate = $request->input('start_date', Carbon::now()->subDays(30)->toDateString());
-        $endDate = $request->input('end_date', Carbon::now()->toDateString());
+        // For example, just redirect to admin dashboard or staf dashboard based on role
+        $user = $request->user();
 
-        // Get count of stock transactions in and out in the period
-        $transactionsInCount = StockTransaction::where('type', 'in')
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->count();
+        if ($user->role === 'Admin') {
+            // Admin dashboard data
+            $productCount = Product::count();
 
-        $transactionsOutCount = StockTransaction::where('type', 'out')
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->count();
+            $startDate = $request->input('start_date', \Carbon\Carbon::now()->subDays(30)->toDateString());
+            $endDate = $request->input('end_date', \Carbon\Carbon::now()->toDateString());
 
-        // Get recent user activities (last 10 stock transactions)
-        $recentActivities = StockTransaction::with('user', 'product')
-            ->orderBy('created_at', 'desc')
-            ->limit(10)
-            ->get();
+            $transactionsInCount = StockTransaction::confirmed()->where('type', 'in')
+                ->whereBetween('confirmed_at', [$startDate, $endDate])
+                ->count();
 
-        // Prepare stock graph data: daily stock in and out counts for last 30 days
-        $stockData = StockTransaction::selectRaw('DATE(created_at) as date, type, SUM(quantity) as total_quantity')
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->groupBy('date', 'type')
-            ->orderBy('date')
-            ->get();
+            $transactionsOutCount = StockTransaction::confirmed()->where('type', 'out')
+                ->whereBetween('confirmed_at', [$startDate, $endDate])
+                ->count();
 
-        $dates = [];
-        $stockInData = [];
-        $stockOutData = [];
+            $recentActivities = StockTransaction::confirmed()->with('user', 'product')
+                ->orderBy('confirmed_at', 'desc')
+                ->limit(10)
+                ->get();
 
-        $period = new \DatePeriod(
-            new \DateTime($startDate),
-            new \DateInterval('P1D'),
-            (new \DateTime($endDate))->modify('+1 day')
-        );
+            $stockData = StockTransaction::confirmed()->selectRaw('DATE(confirmed_at) as date, type, SUM(quantity) as total_quantity')
+                ->whereBetween('confirmed_at', [$startDate, $endDate])
+                ->groupBy('date', 'type')
+                ->orderBy('date')
+                ->get();
 
-        foreach ($period as $date) {
-            $dates[] = $date->format('Y-m-d');
-            $stockInData[$date->format('Y-m-d')] = 0;
-            $stockOutData[$date->format('Y-m-d')] = 0;
-        }
+            $dates = [];
+            $stockInData = [];
+            $stockOutData = [];
 
-        foreach ($stockData as $data) {
-            if ($data->type === 'in') {
-                $stockInData[$data->date] = (int) $data->total_quantity;
-            } elseif ($data->type === 'out') {
-                $stockOutData[$data->date] = (int) $data->total_quantity;
+            $period = new \DatePeriod(
+                new \DateTime($startDate),
+                new \DateInterval('P1D'),
+                (new \DateTime($endDate))->modify('+1 day')
+            );
+
+            foreach ($period as $date) {
+                $dates[] = $date->format('Y-m-d');
+                $stockInData[$date->format('Y-m-d')] = 0;
+                $stockOutData[$date->format('Y-m-d')] = 0;
             }
-        }
 
-        return view('admin.dashboard', compact(
-            'productCount',
-            'transactionsInCount',
-            'transactionsOutCount',
-            'recentActivities',
-            'startDate',
-            'endDate',
-            'dates',
-            'stockInData',
-            'stockOutData'
-        ));
+            foreach ($stockData as $data) {
+                if ($data->type === 'in') {
+                    $stockInData[$data->date] = (int) $data->total_quantity;
+                } elseif ($data->type === 'out') {
+                    $stockOutData[$data->date] = (int) $data->total_quantity;
+                }
+            }
+
+            return view('admin.dashboard', compact(
+                'productCount',
+                'transactionsInCount',
+                'transactionsOutCount',
+                'recentActivities',
+                'startDate',
+                'endDate',
+                'dates',
+                'stockInData',
+                'stockOutData'
+            ));
+        } elseif ($user->role === 'Staff Gudang') {
+            // Staf Gudang dashboard data with pending tasks
+            $pendingIncoming = StockTransaction::where('type', 'in')
+                ->where('status', 'pending')
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            $pendingOutgoing = StockTransaction::where('type', 'out')
+                ->where('status', 'pending')
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            return view('staf.dashboard', compact('pendingIncoming', 'pendingOutgoing'));
+        } else {
+            // Default dashboard or redirect
+            return redirect()->route('dashboard');
+        }
     }
 }

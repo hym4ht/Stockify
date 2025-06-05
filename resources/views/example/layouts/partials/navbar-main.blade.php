@@ -2,14 +2,14 @@
   <div class="container py-3 mx-auto">
     <div class="flex items-center justify-between">
       <div class="flex items-center justify-start">
-        <a href="{{ url('/') }}" class="flex mr-4">
+        <a href="{{ url('#') }}" class="flex mr-4">
           <img src="{{ asset('static/images/logo.svg')}}" class="h-8 mr-3" alt="Flowbite Logo" />
           <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Stockify</span>
         </a>
         <div class="hidden sm:flex sm:ml-6">
           <ul class="flex space-x-8">
             <li>
-              <a href="#"
+              <a href="/"
                 class="text-sm font-medium text-gray-700 hover:text-primary-700 dark:text-gray-400 dark:hover:text-primary-500"
                 aria-current="page">Home</a>
             </li>
@@ -69,7 +69,7 @@
           class="block px-3 py-2 text-base font-normal text-gray-600 border-b border-gray-100 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-900 dark:border-gray-700 dark:hover:bg-gray-700 dark:text-gray-400 dark:hover:text-white">Projects</a>
       </li>
       <li>
-        <a href="#"
+        <a href="calendar"
           class="block px-3 py-2 text-base font-normal text-gray-600 border-b border-gray-100 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-900 dark:border-gray-700 dark:hover:bg-gray-700 dark:text-gray-400 dark:hover:text-white">Calendar
         </a>
       </li>

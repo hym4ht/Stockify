@@ -67,9 +67,12 @@ class AuthController extends Controller
             return Redirect::intended('/dashboard'); // Adjust redirect as needed
         }
 
-        return Redirect::back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ])->onlyInput('email');
+        return Redirect::back()
+            ->withErrors([
+                'email' => 'The provided credentials do not match our records.',
+            ])
+            ->with('error', 'Email atau password tidak sesuai.')
+            ->onlyInput('email');
     }
 
     /**

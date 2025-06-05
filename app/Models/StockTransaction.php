@@ -14,7 +14,10 @@ class StockTransaction extends Model
         'type',
         'quantity',
         'description',
+        'status',
         'user_id',
+        'confirmed_by',
+        'confirmed_at',
     ];
 
     public function product()
@@ -25,5 +28,13 @@ class StockTransaction extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Scope a query to only include confirmed transactions.
+     */
+    public function scopeConfirmed($query)
+    {
+        return $query->where('status', 'confirmed');
     }
 }
