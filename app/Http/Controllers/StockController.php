@@ -153,4 +153,169 @@ class StockController extends Controller
     // Stock opname view and update methods can be added here later
 
     // Minimum stock settings can be managed via settings controller or here
+
+    // Display stock opname records
+    public function opnameIndex()
+    {
+        $opnameRecords = StockTransaction::where('type', 'opname')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('staf.opname.index', compact('opnameRecords'));
+    }
+
+    // Show opname masuk records
+    public function opnameMasuk()
+    {
+        $opnameMasukRecords = StockTransaction::where('type', 'in')
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('staf.opname.masuk', compact('opnameMasukRecords'));
+    }
+
+    // Show form to create opname masuk
+    public function createOpnameMasuk()
+    {
+        $products = Product::all();
+        return view('staf.opname.create-masuk', compact('products'));
+    }
+
+    // Store opname masuk transaction
+    public function storeOpnameMasuk(Request $request)
+    {
+        $user = auth()->user();
+
+        $validated = $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|integer|min:1',
+            'description' => 'nullable|string',
+        ]);
+
+        $validated['type'] = 'in';
+        $validated['user_id'] = $user->id;
+        $validated['status'] = 'pending';
+
+        StockTransaction::create($validated);
+
+        return redirect()->route('stock.opname.masuk')->with('success', 'Opname masuk recorded successfully.');
+    }
+
+    // Show opname keluar records
+    public function opnameKeluar()
+    {
+        $opnameKeluarRecords = StockTransaction::where('type', 'out')
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('staf.opname.keluar', compact('opnameKeluarRecords'));
+    }
+
+    // Show form to create opname keluar
+    public function createOpnameKeluar()
+    {
+        $products = Product::all();
+        return view('staf.opname.create-keluar', compact('products'));
+    }
+
+    // Store opname keluar transaction
+    public function storeOpnameKeluar(Request $request)
+    {
+        $user = auth()->user();
+
+        $validated = $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|integer|min:1',
+            'description' => 'nullable|string',
+        ]);
+
+        $validated['type'] = 'out';
+        $validated['user_id'] = $user->id;
+        $validated['status'] = 'pending';
+
+        StockTransaction::create($validated);
+
+        return redirect()->route('stock.opname.keluar')->with('success', 'Opname keluar recorded successfully.');
+    }
+
+    // Confirm stock opname record
+    public function confirmOpname($id)
+    {
+        $user = auth()->user();
+
+        if ($user->role !== 'Staff Gudang') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $opname = StockTransaction::findOrFail($id);
+
+        if ($opname->status !== 'pending') {
+            return redirect()->back()->with('error', 'Opname already confirmed or invalid status.');
+        }
+
+        // Calculate discrepancy if physical_count is set
+        if ($opname->physical_count !== null) {
+            $opname->discrepancy = $opname->physical_count - $opname->quantity;
+        } else {
+            $opname->discrepancy = null;
+        }
+
+        $opname->status = 'confirmed';
+        $opname->confirmed_by = $user->id;
+        $opname->confirmed_at = now();
+        $opname->save();
+
+        // Adjust product stock based on discrepancy
+        $product = $opname->product;
+        if ($opname->discrepancy !== null && $opname->discrepancy !== 0) {
+            $product->increment('stock', $opname->discrepancy);
+        }
+
+        return redirect()->back()->with('success', 'Opname confirmed successfully.');
+    }
+
+    // Bulk confirm opname records with updates
+    public function bulkConfirmOpname(Request $request)
+    {
+        $user = auth()->user();
+
+        if ($user->role !== 'Staff Gudang') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $physicalCounts = $request->input('physical_count', []);
+        $adjustmentNotes = $request->input('adjustment_note', []);
+        $confirmIds = $request->input('confirm', []);
+
+        foreach ($confirmIds as $id) {
+            $opname = StockTransaction::findOrFail($id);
+
+            if ($opname->status !== 'pending') {
+                continue;
+            }
+
+            $opname->physical_count = isset($physicalCounts[$id]) ? (int)$physicalCounts[$id] : null;
+            $opname->adjustment_note = $adjustmentNotes[$id] ?? null;
+
+            if ($opname->physical_count !== null) {
+                $opname->discrepancy = $opname->physical_count - $opname->quantity;
+            } else {
+                $opname->discrepancy = null;
+            }
+
+            $opname->status = 'confirmed';
+            $opname->confirmed_by = $user->id;
+            $opname->confirmed_at = now();
+            $opname->save();
+
+            $product = $opname->product;
+            if ($opname->discrepancy !== null && $opname->discrepancy !== 0) {
+                $product->increment('stock', $opname->discrepancy);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Selected opname records confirmed successfully.');
+    }
 }

@@ -38,7 +38,22 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         try {
-            $this->productService->createProduct($request->all());
+            $data = $request->all();
+            $attributes = $data['attributes'] ?? [];
+            unset($data['attributes']);
+
+            $product = $this->productService->createProduct($data);
+
+            // Create product attributes
+            foreach ($attributes as $attribute) {
+                if (!empty($attribute['name']) && !empty($attribute['value'])) {
+                    $product->attributes()->create([
+                        'name' => $attribute['name'],
+                        'value' => $attribute['value'],
+                    ]);
+                }
+            }
+
             return redirect()->route('admin.products.index')->with('success', 'Product created successfully.');
         } catch (ValidationException $e) {
             return redirect()->back()->withErrors($e->validator)->withInput();

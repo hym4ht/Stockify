@@ -82,8 +82,33 @@
             @enderror
         </div>
 
+        <div class="mb-6">
+        </div>
+
         <button type="submit"
             class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Create Product</button>
     </form>
 </div>
+
+<script>
+    let attributeIndex = 1;
+
+    function addAttributeRow() {
+        const container = document.getElementById('attributes-container');
+        const newRow = document.createElement('div');
+        newRow.classList.add('flex', 'mb-2', 'attribute-row');
+        newRow.innerHTML = `
+            <input type="text" name="attributes[\${attributeIndex}][name]" placeholder="Attribute Name" class="border border-gray-300 rounded px-3 py-2 mr-2 w-1/2" />
+            <input type="text" name="attributes[\${attributeIndex}][value]" placeholder="Attribute Value" class="border border-gray-300 rounded px-3 py-2 w-1/2" />
+            <button type="button" onclick="removeAttributeRow(this)" class="ml-2 text-red-600 hover:text-red-800 font-bold">Remove</button>
+        `;
+        container.appendChild(newRow);
+        attributeIndex++;
+    }
+
+    function removeAttributeRow(button) {
+        const row = button.parentNode;
+        row.parentNode.removeChild(row);
+    }
+</script>
 @endsection

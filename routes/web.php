@@ -74,12 +74,19 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
     Route::get('reports/user-activity', [ReportController::class, 'userActivityReport'])->name('reports.user_activity');
     Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
-    
-    
-
 });
 
 // Route for staf gudang to confirm stock transactions
 Route::middleware(['auth'])->group(function () {
     Route::post('/staf/confirm/{id}', [StockController::class, 'confirmTransaction'])->name('staf.confirm');
+
+    // Stock opname routes for staff gudang
+    Route::get('/stock/opname', [StockController::class, 'opnameIndex'])->name('stock.opname.index');
+    Route::get('/stock/opname/masuk', [StockController::class, 'opnameMasuk'])->name('stock.opname.masuk');
+    Route::get('/stock/opname/masuk/create', [StockController::class, 'createOpnameMasuk'])->name('stock.opname.masuk.create');
+    Route::post('/stock/opname/masuk', [StockController::class, 'storeOpnameMasuk'])->name('stock.opname.masuk.store');
+    Route::get('/stock/opname/keluar', [StockController::class, 'opnameKeluar'])->name('stock.opname.keluar');
+    Route::get('/stock/opname/keluar/create', [StockController::class, 'createOpnameKeluar'])->name('stock.opname.keluar.create');
+    Route::post('/stock/opname/keluar', [StockController::class, 'storeOpnameKeluar'])->name('stock.opname.keluar.store');
+    Route::post('/stock/opname/confirm/{id}', [StockController::class, 'confirmOpname'])->name('stock.opname.confirm');
 });
