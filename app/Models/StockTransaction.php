@@ -16,6 +16,8 @@ class StockTransaction extends Model
         'physical_count',
         'discrepancy',
         'adjustment_note',
+        'damaged_goods',
+        'lost_goods',
         'description',
         'status',
         'user_id',

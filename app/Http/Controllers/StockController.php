@@ -6,6 +6,7 @@ use App\Models\StockTransaction;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class StockController extends Controller
 {
@@ -13,7 +14,22 @@ class StockController extends Controller
     public function index()
     {
         $transactions = StockTransaction::with(['product', 'user'])->orderBy('created_at', 'desc')->paginate(20);
-        return view('admin.stock.index', compact('transactions'));
+
+        // Calculate total stock from products table
+        $totalStock = \App\Models\Product::sum('stock');
+
+        // Calculate total lost/damaged goods from confirmed stock transactions
+        $totalLostDamaged = StockTransaction::confirmed()
+            ->selectRaw('COALESCE(SUM(damaged_goods), 0) + COALESCE(SUM(lost_goods), 0) as total')
+            ->value('total');
+
+        // Calculate total returned goods from confirmed stock transactions with type 'out' and description containing 'return'
+        $totalReturned = StockTransaction::confirmed()
+            ->where('type', 'out')
+            ->where('description', 'like', '%return%')
+            ->sum('quantity');
+
+        return view('admin.stock.index', compact('transactions', 'totalStock', 'totalLostDamaged', 'totalReturned'));
     }
 
     // Show form to add stock transaction (in or out)
@@ -158,6 +174,7 @@ class StockController extends Controller
     public function opnameIndex()
     {
         $opnameRecords = StockTransaction::where('type', 'opname')
+            ->where('status', 'pending')
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -265,12 +282,31 @@ class StockController extends Controller
         $opname->status = 'confirmed';
         $opname->confirmed_by = $user->id;
         $opname->confirmed_at = now();
+
+        // Save damaged_goods and lost_goods if provided in request
+        if (request()->has('damaged_goods')) {
+            $opname->damaged_goods = (int) request()->input('damaged_goods');
+        }
+        if (request()->has('lost_goods')) {
+            $opname->lost_goods = (int) request()->input('lost_goods');
+        }
+
         $opname->save();
 
-        // Adjust product stock based on discrepancy
+        // Adjust product stock based on discrepancy, damaged_goods, and lost_goods
         $product = $opname->product;
-        if ($opname->discrepancy !== null && $opname->discrepancy !== 0) {
-            $product->increment('stock', $opname->discrepancy);
+        $totalAdjustment = 0;
+        if ($opname->discrepancy !== null) {
+            $totalAdjustment += $opname->discrepancy;
+        }
+        if ($opname->damaged_goods !== null) {
+            $totalAdjustment -= $opname->damaged_goods;
+        }
+        if ($opname->lost_goods !== null) {
+            $totalAdjustment -= $opname->lost_goods;
+        }
+        if ($totalAdjustment !== 0) {
+            $product->increment('stock', $totalAdjustment);
         }
 
         return redirect()->back()->with('success', 'Opname confirmed successfully.');
@@ -285,19 +321,43 @@ class StockController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
+        Log::info('bulkConfirmOpname called', [
+            'user_id' => $user->id,
+            'confirm_ids' => $request->input('confirm', []),
+        ]);
+
         $physicalCounts = $request->input('physical_count', []);
         $adjustmentNotes = $request->input('adjustment_note', []);
+        $damagedGoods = $request->input('damaged_goods', []);
+        $lostGoods = $request->input('lost_goods', []);
         $confirmIds = $request->input('confirm', []);
 
+        // Fix: get keys of confirm array as IDs
+        if (is_array($confirmIds)) {
+            $confirmIds = array_keys($confirmIds);
+        }
+
+        // Debug: flash count of IDs received
+        session()->flash('debug_confirm_count', count($confirmIds));
+
+        $processedCount = 0;
         foreach ($confirmIds as $id) {
-            $opname = StockTransaction::findOrFail($id);
+            $opname = StockTransaction::find($id);
+            if (!$opname) {
+                // Skip if record not found
+                Log::warning("StockTransaction not found for ID: $id");
+                continue;
+            }
 
             if ($opname->status !== 'pending') {
+                Log::info("StockTransaction ID $id skipped due to status: " . $opname->status);
                 continue;
             }
 
             $opname->physical_count = isset($physicalCounts[$id]) ? (int)$physicalCounts[$id] : null;
             $opname->adjustment_note = $adjustmentNotes[$id] ?? null;
+            $opname->damaged_goods = isset($damagedGoods[$id]) ? (int)$damagedGoods[$id] : null;
+            $opname->lost_goods = isset($lostGoods[$id]) ? (int)$lostGoods[$id] : null;
 
             if ($opname->physical_count !== null) {
                 $opname->discrepancy = $opname->physical_count - $opname->quantity;
@@ -310,12 +370,24 @@ class StockController extends Controller
             $opname->confirmed_at = now();
             $opname->save();
 
-            $product = $opname->product;
-            if ($opname->discrepancy !== null && $opname->discrepancy !== 0) {
-                $product->increment('stock', $opname->discrepancy);
+            $product = $opname->product()->lockForUpdate()->first();
+            $totalAdjustment = 0;
+            if ($opname->discrepancy !== null) {
+                $totalAdjustment += $opname->discrepancy;
             }
+            if ($opname->damaged_goods !== null) {
+                $totalAdjustment -= $opname->damaged_goods;
+            }
+            if ($opname->lost_goods !== null) {
+                $totalAdjustment -= $opname->lost_goods;
+            }
+            if ($totalAdjustment !== 0) {
+                $product->increment('stock', $totalAdjustment);
+                $product->save();
+            }
+            $processedCount++;
         }
 
-        return redirect()->back()->with('success', 'Selected opname records confirmed successfully.');
+        return redirect()->back()->with('success', "Selected opname records confirmed successfully. Processed: $processedCount, Received: " . count($confirmIds));
     }
 }

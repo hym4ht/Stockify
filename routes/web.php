@@ -11,6 +11,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductAttributeController;
+use App\Http\Controllers\ChatController;
 
 /*
 |--------------------------------------------------------------------------
@@ -78,15 +79,28 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
 
 // Route for staf gudang to confirm stock transactions
 Route::middleware(['auth'])->group(function () {
-    Route::post('/staf/confirm/{id}', [StockController::class, 'confirmTransaction'])->name('staf.confirm');
+    // Route::post('/staf/confirm/{id}', [StockController::class, 'confirmTransaction'])->name('staf.confirm');
 
     // Stock opname routes for staff gudang
     Route::get('/stock/opname', [StockController::class, 'opnameIndex'])->name('stock.opname.index');
     Route::get('/stock/opname/masuk', [StockController::class, 'opnameMasuk'])->name('stock.opname.masuk');
-    Route::get('/stock/opname/masuk/create', [StockController::class, 'createOpnameMasuk'])->name('stock.opname.masuk.create');
-    Route::post('/stock/opname/masuk', [StockController::class, 'storeOpnameMasuk'])->name('stock.opname.masuk.store');
+    // Route::get('/stock/opname/masuk/create', [StockController::class, 'createOpnameMasuk'])->name('stock.opname.masuk.create');
+    // Route::post('/stock/opname/masuk', [StockController::class, 'storeOpnameMasuk'])->name('stock.opname.masuk.store');
     Route::get('/stock/opname/keluar', [StockController::class, 'opnameKeluar'])->name('stock.opname.keluar');
-    Route::get('/stock/opname/keluar/create', [StockController::class, 'createOpnameKeluar'])->name('stock.opname.keluar.create');
-    Route::post('/stock/opname/keluar', [StockController::class, 'storeOpnameKeluar'])->name('stock.opname.keluar.store');
+    // Route::get('/stock/opname/keluar/create', [StockController::class, 'createOpnameKeluar'])->name('stock.opname.keluar.create');
+    // Route::post('/stock/opname/keluar', [StockController::class, 'storeOpnameKeluar'])->name('stock.opname.keluar.store');
     Route::post('/stock/opname/confirm/{id}', [StockController::class, 'confirmOpname'])->name('stock.opname.confirm');
+    Route::post('/stock/opname/bulk-confirm', [StockController::class, 'bulkConfirmOpname'])->name('stock.opname.bulkConfirm');
+    Route::get('/stock/opname/bulk-confirm', function () {
+        return redirect()->route('stock.opname.index');
+    });
+    Route::get('/stock', [StockController::class, 'index'])->name('stock.index');
+
+    // Chat routes
+    Route::get('/chat/inbox', [ChatController::class, 'inbox'])->name('chat.inbox');
+    Route::get('/chat/{userId}', [ChatController::class, 'chat'])->name('chat.chat');
+    Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
+
+    // API route for user search
+    Route::get('/chat/search-users', [ChatController::class, 'searchUsers'])->name('chat.searchUsers');
 });
