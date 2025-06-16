@@ -255,108 +255,85 @@ class StockController extends Controller
     }
 
     // Confirm stock opname record
-    public function confirmOpname($id)
-    {
-        $user = auth()->user();
+   // Confirm stock opname record
+public function confirmOpname($id)
+{
+    $user = auth()->user();
 
-        if ($user->role !== 'Staff Gudang') {
-            abort(403, 'Unauthorized action.');
-        }
+    if ($user->role !== 'Staff Gudang') {
+        abort(403, 'Unauthorized action.');
+    }
 
+    $opname = StockTransaction::findOrFail($id);
+
+    if ($opname->status !== 'pending') {
+        return redirect()->back()->with('error', 'Opname already confirmed or invalid status.');
+    }
+
+    // Update status opname
+    $opname->status = 'confirmed';
+    $opname->confirmed_by = $user->id;
+    $opname->confirmed_at = now();
+    $opname->save();
+
+    // Hanya tambahkan physical_count ke stok produk
+    $product = $opname->product;
+    
+    if ($opname->physical_count !== null && $opname->physical_count > 0) {
+        $product->increment('stock', $opname->physical_count);
+    }
+
+    // Tidak ada operasi untuk damaged_lost_goods karena sudah tercatat di transaksi
+    return redirect()->back()->with('success', 'Opname confirmed successfully.');
+}
+
+// Bulk confirm opname records
+public function bulkConfirmOpname(Request $request)
+{
+    $user = auth()->user();
+
+    if ($user->role !== 'Staff Gudang') {
+        abort(403, 'Unauthorized action.');
+    }
+
+    $physicalCounts = $request->input('physical_count', []);
+    $damagedLostGoods = $request->input('damaged_lost_goods', []);
+    $confirmIds = $request->input('confirm', []);
+
+    if (is_array($confirmIds)) {
+        $confirmIds = array_keys($confirmIds);
+    }
+
+    $processedCount = 0;
+    foreach ($confirmIds as $id) {
         $opname = StockTransaction::findOrFail($id);
-
+        if (!$opname) {
+            continue;
+        }
 
         if ($opname->status !== 'pending') {
-            return redirect()->back()->with('error', 'Opname already confirmed or invalid status.');
+            continue;
         }
 
-        // Remove discrepancy usage, use physical_count for stock adjustment
+        // Update nilai fisik dan kerusakan
+        $opname->physical_count = isset($physicalCounts[$id]) ? (int)$physicalCounts[$id] : null;
+        $opname->damaged_lost_goods = isset($damagedLostGoods[$id]) ? (int)$damagedLostGoods[$id] : null;
+        
+        // Update status
         $opname->status = 'confirmed';
         $opname->confirmed_by = $user->id;
         $opname->confirmed_at = now();
-
         $opname->save();
-       
 
-
-        // Adjust product stock by adding physical_count and subtracting damaged_lost_goods separately
+        // Hanya tambahkan physical_count ke stok produk
         $product = $opname->product;
-        
+        if ($opname->physical_count !== null && $opname->physical_count > 0) {
+            $product->increment('stock', $opname->physical_count);
+        }
 
-           if ($opname->physical_count !== null && $opname->physical_count > 0) {
-                $product->increment('stock', $opname->physical_count);
-            }
-
-            if ($opname->damaged_lost_goods !== null && $opname->damaged_lost_goods > 0) {
-                $product->decrement( column: 'stock', amount: $opname->damaged_lost_goods);
-            }
-
-                return redirect()->back()->with('success', 'Opname confirmed successfully.');
+        $processedCount++;
     }
 
-    // Bulk confirm opname records with updates
-    public function bulkConfirmOpname(Request $request)
-    {
-        $user = auth()->user();
-
-        if ($user->role !== 'Staff Gudang') {
-            abort(403, 'Unauthorized action.');
-        }
-        if ($user->role !== 'Staff Gudang') {
-            abort(403, 'Unauthorized action.');
-        }
-
-        Log::info('bulkConfirmOpname called', [
-            'user_id' => $user->id,
-            'confirm_ids' => $request->input('confirm', []),
-        ]);
-
-        $physicalCounts = $request->input('physical_count', []);
-        $damagedLostGoods = $request->input('damaged_lost_goods', []);
-        $confirmIds = $request->input('confirm', []);
-
-        // Fix: get keys of confirm array as IDs
-        if (is_array($confirmIds)) {
-            $confirmIds = array_keys($confirmIds);
-        }
-
-        // Debug: flash count of IDs received
-        session()->flash('debug_confirm_count', count($confirmIds));
-
-        $processedCount = 0;
-        foreach ($confirmIds as $id) {
-            $opname = StockTransaction::findOrFail($id);
-            if (!$opname) {
-                // Skip if record not found
-                Log::warning("StockTransaction not found for ID: $id");
-                continue;
-            }
-
-            if ($opname->status !== 'pending') {
-                Log::info("StockTransaction ID $id skipped due to status: " . $opname->status);
-                continue;
-            }
-
-            $opname->physical_count = isset($physicalCounts[$id]) ? (int)$physicalCounts[$id] : null;
-            $opname->damaged_lost_goods = isset($damagedLostGoods[$id]) ? (int)$damagedLostGoods[$id] : null;
-
-            // Adjust product stock by adding physical_count and subtracting damaged_lost_goods separately
-            $opname->status = 'confirmed';
-            $opname->confirmed_by = $user->id;
-            $opname->confirmed_at = now();
-            $opname->save();
-
-            $product = $opname->product()->lockForUpdate()->first();
-            if ($opname->physical_count !== null && $opname->physical_count > 0) {
-                $product->increment('stock', $opname->physical_count);
-            }
-            if ($opname->damaged_lost_goods !== null && $opname->damaged_lost_goods > 0) {
-                $product->decrement('stock', $opname->damaged_lost_goods);
-            }
-            $product->save();
-            $processedCount++;
-        }
-
-        return redirect()->back()->with('success', "Selected opname records confirmed successfully. Processed: $processedCount, Received: " . count($confirmIds));
-    }
+    return redirect()->back()->with('success', "Selected opname records confirmed successfully. Processed: $processedCount");
+}
 }
