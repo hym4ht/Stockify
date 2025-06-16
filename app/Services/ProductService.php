@@ -97,7 +97,6 @@ class ProductService
             'sku' => 'nullable|string|unique:products,sku' . ($productId ? ',' . $productId : ''),
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
         ];
 
         $validator = Validator::make($data, $rules);

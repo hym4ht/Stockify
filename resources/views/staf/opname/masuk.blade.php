@@ -15,8 +15,8 @@
                     <th class="border border-gray-300 px-4 py-2">Produk</th>
                     <th class="border border-gray-300 px-4 py-2">Jumlah Sistem</th>
                     <th class="border border-gray-300 px-4 py-2">Jumlah Fisik</th>
-                    <th class="border border-gray-300 px-4 py-2">Selisih</th>
-                    <th class="border border-gray-300 px-4 py-2">Keterangan Penyesuaian</th>
+                    {{-- <th class="border border-gray-300 px-4 py-2">Selisih</th> --}}
+                    <th class="border border-gray-300 px-4 py-2">Barang Hilang/Rusak</th>
                     <th class="border border-gray-300 px-4 py-2">Konfirmasi</th>
                 </tr>
             </thead>
@@ -30,13 +30,7 @@
                         <input type="number" name="physical_count[{{ $opname->id }}]" value="{{ old('physical_count.' . $opname->id, $opname->physical_count) }}" class="w-full border border-gray-300 rounded px-2 py-1" />
                     </td>
                     <td class="border border-gray-300 px-4 py-2">
-                        @php
-                        $discrepancy = $opname->physical_count !== null ? $opname->physical_count - $opname->quantity : '-';
-                        @endphp
-                        {{ $discrepancy }}
-                    </td>
-                    <td class="border border-gray-300 px-4 py-2">
-                        <input type="text" name="adjustment_note[{{ $opname->id }}]" value="{{ old('adjustment_note.' . $opname->id, $opname->adjustment_note) }}" class="w-full border border-gray-300 rounded px-2 py-1" />
+                        <input type="number" name="damaged_lost_goods[{{ $opname->id }}]" value="{{ old('damaged_lost_goods.' . $opname->id, $opname->damaged_lost_goods) }}" class="w-full border border-gray-300 rounded px-2 py-1" />
                     </td>
                     <td class="border border-gray-300 px-4 py-2 text-center">
                         <input type="checkbox" name="confirm[{{ $opname->id }}]" />

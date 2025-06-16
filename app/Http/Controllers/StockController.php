@@ -16,20 +16,17 @@ class StockController extends Controller
         $transactions = StockTransaction::with(['product', 'user'])->orderBy('created_at', 'desc')->paginate(20);
 
         // Calculate total stock from products table
-        $totalStock = \App\Models\Product::sum('stock');
 
-        // Calculate total lost/damaged goods from confirmed stock transactions
-        $totalLostDamaged = StockTransaction::confirmed()
-            ->selectRaw('COALESCE(SUM(damaged_goods), 0) + COALESCE(SUM(lost_goods), 0) as total')
-            ->value('total');
 
-        // Calculate total returned goods from confirmed stock transactions with type 'out' and description containing 'return'
-        $totalReturned = StockTransaction::confirmed()
-            ->where('type', 'out')
-            ->where('description', 'like', '%return%')
-            ->sum('quantity');
+        // Calculate total damaged/lost goods from confirmed opname transactions
+        $damagedLostSum = StockTransaction::confirmed()
+            ->where('type', 'in')
+            ->sum('damaged_lost_goods');
 
-        return view('admin.stock.index', compact('transactions', 'totalStock', 'totalLostDamaged', 'totalReturned'));
+        // mengambil semua data stock
+        $totalStock = Product::sum('stock');
+
+        return view('admin.stock.index', compact('totalStock', 'damagedLostSum', 'transactions'));
     }
 
     // Show form to add stock transaction (in or out)
@@ -268,48 +265,33 @@ class StockController extends Controller
 
         $opname = StockTransaction::findOrFail($id);
 
+
         if ($opname->status !== 'pending') {
             return redirect()->back()->with('error', 'Opname already confirmed or invalid status.');
         }
 
-        // Calculate discrepancy if physical_count is set
-        if ($opname->physical_count !== null) {
-            $opname->discrepancy = $opname->physical_count - $opname->quantity;
-        } else {
-            $opname->discrepancy = null;
-        }
-
+        // Remove discrepancy usage, use physical_count for stock adjustment
         $opname->status = 'confirmed';
         $opname->confirmed_by = $user->id;
         $opname->confirmed_at = now();
 
-        // Save damaged_goods and lost_goods if provided in request
-        if (request()->has('damaged_goods')) {
-            $opname->damaged_goods = (int) request()->input('damaged_goods');
-        }
-        if (request()->has('lost_goods')) {
-            $opname->lost_goods = (int) request()->input('lost_goods');
-        }
-
         $opname->save();
+       
 
-        // Adjust product stock based on discrepancy, damaged_goods, and lost_goods
+
+        // Adjust product stock by adding physical_count and subtracting damaged_lost_goods separately
         $product = $opname->product;
-        $totalAdjustment = 0;
-        if ($opname->discrepancy !== null) {
-            $totalAdjustment += $opname->discrepancy;
-        }
-        if ($opname->damaged_goods !== null) {
-            $totalAdjustment -= $opname->damaged_goods;
-        }
-        if ($opname->lost_goods !== null) {
-            $totalAdjustment -= $opname->lost_goods;
-        }
-        if ($totalAdjustment !== 0) {
-            $product->increment('stock', $totalAdjustment);
-        }
+        
 
-        return redirect()->back()->with('success', 'Opname confirmed successfully.');
+           if ($opname->physical_count !== null && $opname->physical_count > 0) {
+                $product->increment('stock', $opname->physical_count);
+            }
+
+            if ($opname->damaged_lost_goods !== null && $opname->damaged_lost_goods > 0) {
+                $product->decrement( column: 'stock', amount: $opname->damaged_lost_goods);
+            }
+
+                return redirect()->back()->with('success', 'Opname confirmed successfully.');
     }
 
     // Bulk confirm opname records with updates
@@ -320,6 +302,9 @@ class StockController extends Controller
         if ($user->role !== 'Staff Gudang') {
             abort(403, 'Unauthorized action.');
         }
+        if ($user->role !== 'Staff Gudang') {
+            abort(403, 'Unauthorized action.');
+        }
 
         Log::info('bulkConfirmOpname called', [
             'user_id' => $user->id,
@@ -327,9 +312,7 @@ class StockController extends Controller
         ]);
 
         $physicalCounts = $request->input('physical_count', []);
-        $adjustmentNotes = $request->input('adjustment_note', []);
-        $damagedGoods = $request->input('damaged_goods', []);
-        $lostGoods = $request->input('lost_goods', []);
+        $damagedLostGoods = $request->input('damaged_lost_goods', []);
         $confirmIds = $request->input('confirm', []);
 
         // Fix: get keys of confirm array as IDs
@@ -342,7 +325,7 @@ class StockController extends Controller
 
         $processedCount = 0;
         foreach ($confirmIds as $id) {
-            $opname = StockTransaction::find($id);
+            $opname = StockTransaction::findOrFail($id);
             if (!$opname) {
                 // Skip if record not found
                 Log::warning("StockTransaction not found for ID: $id");
@@ -355,36 +338,22 @@ class StockController extends Controller
             }
 
             $opname->physical_count = isset($physicalCounts[$id]) ? (int)$physicalCounts[$id] : null;
-            $opname->adjustment_note = $adjustmentNotes[$id] ?? null;
-            $opname->damaged_goods = isset($damagedGoods[$id]) ? (int)$damagedGoods[$id] : null;
-            $opname->lost_goods = isset($lostGoods[$id]) ? (int)$lostGoods[$id] : null;
+            $opname->damaged_lost_goods = isset($damagedLostGoods[$id]) ? (int)$damagedLostGoods[$id] : null;
 
-            if ($opname->physical_count !== null) {
-                $opname->discrepancy = $opname->physical_count - $opname->quantity;
-            } else {
-                $opname->discrepancy = null;
-            }
-
+            // Adjust product stock by adding physical_count and subtracting damaged_lost_goods separately
             $opname->status = 'confirmed';
             $opname->confirmed_by = $user->id;
             $opname->confirmed_at = now();
             $opname->save();
 
             $product = $opname->product()->lockForUpdate()->first();
-            $totalAdjustment = 0;
-            if ($opname->discrepancy !== null) {
-                $totalAdjustment += $opname->discrepancy;
+            if ($opname->physical_count !== null && $opname->physical_count > 0) {
+                $product->increment('stock', $opname->physical_count);
             }
-            if ($opname->damaged_goods !== null) {
-                $totalAdjustment -= $opname->damaged_goods;
+            if ($opname->damaged_lost_goods !== null && $opname->damaged_lost_goods > 0) {
+                $product->decrement('stock', $opname->damaged_lost_goods);
             }
-            if ($opname->lost_goods !== null) {
-                $totalAdjustment -= $opname->lost_goods;
-            }
-            if ($totalAdjustment !== 0) {
-                $product->increment('stock', $totalAdjustment);
-                $product->save();
-            }
+            $product->save();
             $processedCount++;
         }
 

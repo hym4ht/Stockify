@@ -28,18 +28,14 @@ class AppServiceProvider extends ServiceProvider
                 ->where('type', 'out')
                 ->sum('quantity');
 
-            $totalDamagedGoods = \App\Models\StockTransaction::confirmed()
-                ->sum('damaged_goods');
-
-            $totalLostGoods = \App\Models\StockTransaction::confirmed()
-                ->sum('lost_goods');
+            $totalDamagedLostGoods = \App\Models\StockTransaction::confirmed()
+                ->sum('damaged_lost_goods');
 
             $totalStock = $totalStockIn - $totalStockOut;
 
             $view->with([
                 'totalStock' => $totalStock,
-                'totalDamagedGoods' => $totalDamagedGoods,
-                'totalLostGoods' => $totalLostGoods,
+                'totalDamagedLostGoods' => $totalDamagedLostGoods,
             ]);
         });
     }

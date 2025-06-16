@@ -60,10 +60,14 @@ class ReportController extends Controller
     // User activity report
     public function userActivityReport(Request $request)
     {
-        $query = StockTransaction::with('user');
+        $query = StockTransaction::with(['user', 'product']);
 
         if ($request->filled('user_id')) {
             $query->where('user_id', $request->user_id);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
         }
 
         $activities = $query->get();

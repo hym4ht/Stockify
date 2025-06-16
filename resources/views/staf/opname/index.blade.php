@@ -36,10 +36,8 @@
                     <th class="border border-gray-300 px-4 py-2">Produk</th>
                     <th class="border border-gray-300 px-4 py-2">Jumlah Sistem</th>
                     <th class="border border-gray-300 px-4 py-2">Jumlah Fisik</th>
-                    <th class="border border-gray-300 px-4 py-2">Barang Rusak</th>
-                    <th class="border border-gray-300 px-4 py-2">Barang Hilang</th>
+                    <th class="border border-gray-300 px-4 py-2">Barang Hilang/Rusak</th>
                     <th class="border border-gray-300 px-4 py-2">Selisih</th>
-                    <th class="border border-gray-300 px-4 py-2">Keterangan Penyesuaian</th>
                     @if(auth()->user()->role !== 'Staff Gudang')
                     <th class="border border-gray-300 px-4 py-2">Konfirmasi</th>
                     @endif
@@ -65,21 +63,13 @@
                     </td>
                     <td class="border border-gray-300 px-4 py-2">
                         @if(auth()->user()->role !== 'Staff Gudang')
-                        <input type="number" name="damaged_goods[{{ $opname->id }}]" value="{{ old('damaged_goods.' . $opname->id, $opname->damaged_goods) }}" class="w-full border border-gray-300 rounded px-2 py-1" />
+                        <input type="number" name="damaged_lost_goods[{{ $opname->id }}]" value="{{ old('damaged_lost_goods.' . $opname->id, $opname->damaged_lost_goods) }}" class="w-full border border-gray-300 rounded px-2 py-1" />
                         @else
-                        {{ $opname->damaged_goods ?? '-' }}
+                        {{ $opname->damaged_lost_goods ?? '-' }}
                         @endif
-                    </td>
-                    <td class="border border-gray-300 px-4 py-2">
-                        @if(auth()->user()->role !== 'Staff Gudang')
-                        <input type="number" name="lost_goods[{{ $opname->id }}]" value="{{ old('lost_goods.' . $opname->id, $opname->lost_goods) }}" class="w-full border border-gray-300 rounded px-2 py-1" />
-                        @else
-                        {{ $opname->lost_goods ?? '-' }}
-                        @endif
-                    </td>
                     <td class="border border-gray-300 px-4 py-2">
                         @php
-                        $discrepancy = $opname->physical_count !== null ? $opname->physical_count - $opname->quantity - ($opname->damaged_goods ?? 0) - ($opname->lost_goods ?? 0) : '-';
+                        $discrepancy = $opname->physical_count !== null ? $opname->physical_count - $opname->quantity - ($opname->damaged_lost_goods ?? 0)  : '-';
                         @endphp
                         {{ $discrepancy }}
                     </td>

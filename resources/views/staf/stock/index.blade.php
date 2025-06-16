@@ -9,8 +9,7 @@
             <tr>
                 <th class="py-2 px-4 border-b border-gray-200 text-left">Nama Barang</th>
                 <th class="py-2 px-4 border-b border-gray-200 text-right">Stok</th>
-                <th class="py-2 px-4 border-b border-gray-200 text-right">Barang Rusak</th>
-                <th class="py-2 px-4 border-b border-gray-200 text-right">Barang Hilang</th>
+                <th class="py-2 px-4 border-b border-gray-200 text-right">Barang Hilang/Rusak</th>
             </tr>
         </thead>
         <tbody>

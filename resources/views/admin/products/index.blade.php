@@ -15,7 +15,6 @@
         <table class="w-full border-collapse bg-white text-left text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-400">
             <thead class="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                    <th scope="col" class="px-6 py-4 font-medium text-gray-900 dark:text-white">ID</th>
                     <th scope="col" class="px-6 py-4 font-medium text-gray-900 dark:text-white">Name</th>
                     <th scope="col" class="px-6 py-4 font-medium text-gray-900 dark:text-white">Price</th>
                     <th scope="col" class="px-6 py-4 font-medium text-gray-900 dark:text-white">Category</th>
@@ -25,7 +24,6 @@
             <tbody class="divide-y divide-gray-100 border-t border-gray-100 dark:divide-gray-700 dark:border-gray-700">
                 @forelse ($products as $product)
                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-600">
-                    <td class="px-6 py-4">{{ $product->id }}</td>
                     <td class="px-6 py-4">{{ $product->name }}</td>
                     <td class="px-6 py-4">${{ number_format($product->price, 2) }}</td>
                     <td class="px-6 py-4">{{ $product->category->name ?? 'N/A' }}</td>

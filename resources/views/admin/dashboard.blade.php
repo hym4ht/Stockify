@@ -82,63 +82,65 @@
 
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
-            const dates = @json($dates);
-            const stockInData = @json(array_values($stockInData));
-            const stockOutData = @json(array_values($stockOutData));
+            document.addEventListener('DOMContentLoaded', function () {
+                const dates = @json($dates);
+                const stockInData = @json(array_values($stockInData));
+                const stockOutData = @json(array_values($stockOutData));
 
-            const ctx = document.getElementById('stockChart').getContext('2d');
-            const stockChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: dates,
-                    datasets: [
-                        {
-                            label: 'Stock In',
-                            data: stockInData,
-                            borderColor: 'rgba(34, 197, 94, 1)', // green
-                            backgroundColor: 'rgba(34, 197, 94, 0.2)',
-                            fill: true,
-                            tension: 0.3,
-                            pointRadius: 3,
-                            pointHoverRadius: 6,
-                        },
-                        {
-                            label: 'Stock Out',
-                            data: stockOutData,
-                            borderColor: 'rgba(239, 68, 68, 1)', // red
-                            backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                            fill: true,
-                            tension: 0.3,
-                            pointRadius: 3,
-                            pointHoverRadius: 6,
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    interaction: {
-                        mode: 'nearest',
-                        intersect: false
+                const ctx = document.getElementById('stockChart').getContext('2d');
+                const stockChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: dates,
+                        datasets: [
+                            {
+                                label: 'Stock In',
+                                data: stockInData,
+                                borderColor: 'rgba(34, 197, 94, 1)', // green
+                                backgroundColor: 'rgba(34, 197, 94, 0.2)',
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 3,
+                                pointHoverRadius: 6,
+                            },
+                            {
+                                label: 'Stock Out',
+                                data: stockOutData,
+                                borderColor: 'rgba(239, 68, 68, 1)', // red
+                                backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 3,
+                                pointHoverRadius: 6,
+                            }
+                        ]
                     },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            enabled: true,
-                            mode: 'index',
+                    options: {
+                        responsive: true,
+                        interaction: {
+                            mode: 'nearest',
                             intersect: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: 1
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                enabled: true,
+                                mode: 'index',
+                                intersect: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
                             }
                         }
                     }
-                }
+                });
             });
         </script>
     </div>

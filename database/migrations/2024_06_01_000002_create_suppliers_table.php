@@ -6,14 +6,11 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateSuppliersTable extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
         Schema::create('suppliers', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
+            $table->string('name');
             $table->string('contact_name')->nullable();
             $table->string('phone')->nullable();
             $table->string('email')->nullable();
@@ -22,10 +19,7 @@ class CreateSuppliersTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('suppliers');
     }
