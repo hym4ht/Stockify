@@ -63,7 +63,9 @@
                         <th class="py-2 px-4 border-b text-gray-900 dark:text-white">Product</th>
                         <th class="py-2 px-4 border-b text-gray-900 dark:text-white">Type</th>
                         <th class="py-2 px-4 border-b text-gray-900 dark:text-white">Quantity</th>
-                        <th class="py-2 px-4 border-b text-gray-900 dark:text-white">Date</th>
+                        <th class="py-2 px-2 border-b text-gray-900 dark:text-white">Date</th>
+                        <th class="py-2 px--10 border-b text-gray-900 dark:text-white">Barang Fisik</th>
+                        <th class="py-2 px-1 border-b text-gray-900 dark:text-white">Barang Rusak/Hilang</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -74,8 +76,11 @@
                         <td class="py-2 px-4 border-b text-gray-700 dark:text-gray-300">{{ ucfirst($activity->type) }}</td>
                         <td class="py-2 px-4 border-b text-gray-700 dark:text-gray-300">{{ $activity->quantity }}</td>
                         <td class="py-2 px-4 border-b text-gray-700 dark:text-gray-300">{{ $activity->created_at->format('Y-m-d H:i') }}</td>
+                         <td class="py-2 px-10 border-b text-gray-700 dark:text-gray-300">{{ $activity->physical_count }}</td>
+                          <td class="py-2 px-20 border-b text-gray-700 dark:text-gray-300">{{ $activity->damaged_lost_goods }}</td>
                     </tr>
                     @endforeach
+
                 </tbody>
             </table>
         </div>

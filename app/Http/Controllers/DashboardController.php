@@ -35,8 +35,10 @@ class DashboardController extends Controller
 
             $recentActivities = StockTransaction::confirmed()->with('user', 'product')
                 ->orderBy('confirmed_at', 'desc')
+            
                 ->limit(10)
                 ->get();
+                
 
             $stockData = StockTransaction::confirmed()->selectRaw('DATE(confirmed_at) as date, type, SUM(quantity) as total_quantity')
                 ->whereBetween('confirmed_at', [$startDate, $endDate])
