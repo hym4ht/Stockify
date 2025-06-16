@@ -50,8 +50,8 @@
                 <td class="py-2 px-4 border-b">{{ $transaction->created_at->format('Y-m-d H:i') }}</td>
                 @if(auth()->user()->role === 'Admin')
                 <td class="py-2 px-4 border-b">
-                    <a href="{{ route('admin.stock.edit', $transaction->id) }}" class="text-blue-600 hover:underline mr-2">Edit</a>
-                    <form action="{{ route('admin.stock.destroy', $transaction->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this transaction?');">
+                    <a href="{{ route('admin.transaksi.edit', $transaction->id) }}" class="text-blue-600 hover:underline mr-2">Edit</a>
+                    <form action="{{ route('admin.transaksi.destroy', $transaction->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this transaction?');">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="text-red-600 hover:underline">Delete</button>

@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-class StockController extends Controller
+class TransaksiController extends Controller
 {
     // Display stock transactions
     public function index()
@@ -26,14 +26,14 @@ class StockController extends Controller
         // mengambil semua data stock
         $totalStock = Product::sum('stock');
 
-        return view('admin.stock.index', compact('totalStock', 'damagedLostSum', 'transactions'));
+        return view('admin.transaksi.index', compact('totalStock', 'damagedLostSum', 'transactions'));
     }
 
     // Show form to add stock transaction (in or out)
     public function create()
     {
         $products = Product::all();
-        return view('admin.stock.create', compact('products'));
+        return view('admin.transaksi.create', compact('products'));
     }
 
     // Store stock transaction
@@ -98,7 +98,7 @@ class StockController extends Controller
     {
         $transaction = StockTransaction::findOrFail($id);
         $products = Product::all();
-        return view('admin.stock.edit', compact('transaction', 'products'));
+        return view('admin.transaksi.edit', compact('transaction', 'products'));
     }
 
     // Update stock transaction
@@ -142,7 +142,7 @@ class StockController extends Controller
             $product->decrement('stock', $validated['quantity']);
         }
 
-        return redirect()->route('admin.stock.index')->with('success', 'Stock transaction updated successfully.');
+        return redirect()->route('admin.transaksi.index')->with('success', 'Stock transaction updated successfully.');
     }
 
     // Delete stock transaction
@@ -160,7 +160,7 @@ class StockController extends Controller
 
         $transaction->delete();
 
-        return redirect()->route('admin.stock.index')->with('success', 'Stock transaction deleted successfully.');
+        return redirect()->route('admin.transaksi.index')->with('success', 'Stock transaction deleted successfully.');
     }
 
     // Stock opname view and update methods can be added here later
@@ -255,71 +255,22 @@ class StockController extends Controller
     }
 
     // Confirm stock opname record
-   // Confirm stock opname record
-public function confirmOpname($id)
-{
-    $user = auth()->user();
+    // Confirm stock opname record
+    public function confirmOpname($id)
+    {
+        $user = auth()->user();
 
-    if ($user->role !== 'Staff Gudang') {
-        abort(403, 'Unauthorized action.');
-    }
-
-    $opname = StockTransaction::findOrFail($id);
-
-    if ($opname->status !== 'pending') {
-        return redirect()->back()->with('error', 'Opname already confirmed or invalid status.');
-    }
-
-    // Update status opname
-    $opname->status = 'confirmed';
-    $opname->confirmed_by = $user->id;
-    $opname->confirmed_at = now();
-    $opname->save();
-
-    // Hanya tambahkan physical_count ke stok produk
-    $product = $opname->product;
-    
-    if ($opname->physical_count !== null && $opname->physical_count > 0) {
-        $product->increment('stock', $opname->physical_count);
-    }
-
-    // Tidak ada operasi untuk damaged_lost_goods karena sudah tercatat di transaksi
-    return redirect()->back()->with('success', 'Opname confirmed successfully.');
-}
-
-// Bulk confirm opname records
-public function bulkConfirmOpname(Request $request)
-{
-    $user = auth()->user();
-
-    if ($user->role !== 'Staff Gudang') {
-        abort(403, 'Unauthorized action.');
-    }
-
-    $physicalCounts = $request->input('physical_count', []);
-    $damagedLostGoods = $request->input('damaged_lost_goods', []);
-    $confirmIds = $request->input('confirm', []);
-
-    if (is_array($confirmIds)) {
-        $confirmIds = array_keys($confirmIds);
-    }
-
-    $processedCount = 0;
-    foreach ($confirmIds as $id) {
-        $opname = StockTransaction::findOrFail($id);
-        if (!$opname) {
-            continue;
+        if ($user->role !== 'Staff Gudang') {
+            abort(403, 'Unauthorized action.');
         }
+
+        $opname = StockTransaction::findOrFail($id);
 
         if ($opname->status !== 'pending') {
-            continue;
+            return redirect()->back()->with('error', 'Opname already confirmed or invalid status.');
         }
 
-        // Update nilai fisik dan kerusakan
-        $opname->physical_count = isset($physicalCounts[$id]) ? (int)$physicalCounts[$id] : null;
-        $opname->damaged_lost_goods = isset($damagedLostGoods[$id]) ? (int)$damagedLostGoods[$id] : null;
-        
-        // Update status
+        // Update status opname
         $opname->status = 'confirmed';
         $opname->confirmed_by = $user->id;
         $opname->confirmed_at = now();
@@ -327,13 +278,62 @@ public function bulkConfirmOpname(Request $request)
 
         // Hanya tambahkan physical_count ke stok produk
         $product = $opname->product;
+
         if ($opname->physical_count !== null && $opname->physical_count > 0) {
             $product->increment('stock', $opname->physical_count);
         }
 
-        $processedCount++;
+        // Tidak ada operasi untuk damaged_lost_goods karena sudah tercatat di transaksi
+        return redirect()->back()->with('success', 'Opname confirmed successfully.');
     }
 
-    return redirect()->back()->with('success', "Selected opname records confirmed successfully. Processed: $processedCount");
-}
+    // Bulk confirm opname records
+    public function bulkConfirmOpname(Request $request)
+    {
+        $user = auth()->user();
+
+        if ($user->role !== 'Staff Gudang') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $physicalCounts = $request->input('physical_count', []);
+        $damagedLostGoods = $request->input('damaged_lost_goods', []);
+        $confirmIds = $request->input('confirm', []);
+
+        if (is_array($confirmIds)) {
+            $confirmIds = array_keys($confirmIds);
+        }
+
+        $processedCount = 0;
+        foreach ($confirmIds as $id) {
+            $opname = StockTransaction::findOrFail($id);
+            if (!$opname) {
+                continue;
+            }
+
+            if ($opname->status !== 'pending') {
+                continue;
+            }
+
+            // Update nilai fisik dan kerusakan
+            $opname->physical_count = isset($physicalCounts[$id]) ? (int)$physicalCounts[$id] : null;
+            $opname->damaged_lost_goods = isset($damagedLostGoods[$id]) ? (int)$damagedLostGoods[$id] : null;
+
+            // Update status
+            $opname->status = 'confirmed';
+            $opname->confirmed_by = $user->id;
+            $opname->confirmed_at = now();
+            $opname->save();
+
+            // Hanya tambahkan physical_count ke stok produk
+            $product = $opname->product;
+            if ($opname->physical_count !== null && $opname->physical_count > 0) {
+                $product->increment('stock', $opname->physical_count);
+            }
+
+            $processedCount++;
+        }
+
+        return redirect()->back()->with('success', "Selected opname records confirmed successfully. Processed: $processedCount");
+    }
 }

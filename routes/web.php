@@ -5,7 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SupplierController;
-use App\Http\Controllers\StockController;
+use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingController;
@@ -66,7 +66,7 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
     Route::get('products/export', [ProductController::class, 'export'])->name('products.export');
     Route::resource('categories', CategoryController::class);
     Route::resource('suppliers', SupplierController::class);
-    Route::resource('stock', StockController::class);
+    Route::resource('transaksi', TransaksiController::class);
     Route::resource('users', UserController::class);
     Route::get('users', [UserController::class, 'index'])->name('users.index');
     Route::resource('product_attributes', ProductAttributeController::class);
@@ -79,22 +79,22 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
 
 // Route for staf gudang to confirm stock transactions
 Route::middleware(['auth'])->group(function () {
-    // Route::post('/staf/confirm/{id}', [StockController::class, 'confirmTransaction'])->name('staf.confirm');
+    // Route::post('/staf/confirm/{id}', [TransaksiController::class, 'confirmTransaction'])->name('staf.confirm');
 
     // Stock opname routes for staff gudang
-    Route::get('/stock/opname', [StockController::class, 'opnameIndex'])->name('stock.opname.index');
-    Route::get('/stock/opname/masuk', [StockController::class, 'opnameMasuk'])->name('stock.opname.masuk');
-    // Route::get('/stock/opname/masuk/create', [StockController::class, 'createOpnameMasuk'])->name('stock.opname.masuk.create');
-    // Route::post('/stock/opname/masuk', [StockController::class, 'storeOpnameMasuk'])->name('stock.opname.masuk.store');
-    Route::get('/stock/opname/keluar', [StockController::class, 'opnameKeluar'])->name('stock.opname.keluar');
-    // Route::get('/stock/opname/keluar/create', [StockController::class, 'createOpnameKeluar'])->name('stock.opname.keluar.create');
-    // Route::post('/stock/opname/keluar', [StockController::class, 'storeOpnameKeluar'])->name('stock.opname.keluar.store');
-    Route::post('/stock/opname/confirm/{id}', [StockController::class, 'confirmOpname'])->name('stock.opname.confirm');
-    Route::post('/stock/opname/bulk-confirm', [StockController::class, 'bulkConfirmOpname'])->name('stock.opname.bulkConfirm');
+    Route::get('/stock/opname', [TransaksiController::class, 'opnameIndex'])->name('stock.opname.index');
+    Route::get('/stock/opname/masuk', [TransaksiController::class, 'opnameMasuk'])->name('stock.opname.masuk');
+    // Route::get('/stock/opname/masuk/create', [TransaksiController::class, 'createOpnameMasuk'])->name('stock.opname.masuk.create');
+    // Route::post('/stock/opname/masuk', [TransaksiController::class, 'storeOpnameMasuk'])->name('stock.opname.masuk.store');
+    Route::get('/stock/opname/keluar', [TransaksiController::class, 'opnameKeluar'])->name('stock.opname.keluar');
+    // Route::get('/stock/opname/keluar/create', [TransaksiController::class, 'createOpnameKeluar'])->name('stock.opname.keluar.create');
+    // Route::post('/stock/opname/keluar', [TransaksiController::class, 'storeOpnameKeluar'])->name('stock.opname.keluar.store');
+    Route::post('/stock/opname/confirm/{id}', [TransaksiController::class, 'confirmOpname'])->name('stock.opname.confirm');
+    Route::post('/stock/opname/bulk-confirm', [TransaksiController::class, 'bulkConfirmOpname'])->name('stock.opname.bulkConfirm');
     Route::get('/stock/opname/bulk-confirm', function () {
         return redirect()->route('stock.opname.index');
     });
-    Route::get('/stock', [StockController::class, 'index'])->name('stock.index');
+    Route::get('/stock', [TransaksiController::class, 'index'])->name('stock.index');
 
     // Chat routes
     Route::get('/chat/inbox', [ChatController::class, 'inbox'])->name('chat.inbox');

@@ -6,9 +6,9 @@
         <x-sidebar-menu-dropdown-item-dashboard routeName="admin.products.import.form" title="Import/export data produk" />
         <x-sidebar-menu-dropdown-item-dashboard routeName="admin.categories.index" title="Kategori Produk" />
     </x-sidebar-menu-dropdown-dashboard>
-    <x-sidebar-menu-dropdown-dashboard routeName="admin.stock.*" title="Stok">
-        <x-sidebar-menu-dropdown-item-dashboard routeName="admin.stock.index" title="Riwayat Transaksi" />
-        <x-sidebar-menu-dropdown-item-dashboard routeName="admin.stock.create" title="Tambah Transaksi" />
+    <x-sidebar-menu-dropdown-dashboard routeName="admin.transaksi.*" title="Transaksi">
+        <x-sidebar-menu-dropdown-item-dashboard routeName="admin.transaksi.index" title="Riwayat Transaksi" />
+        <x-sidebar-menu-dropdown-item-dashboard routeName="admin.transaksi.create" title="Tambah Transaksi" />
     </x-sidebar-menu-dropdown-dashboard>
     <x-sidebar-menu-dropdown-dashboard routeName="admin.suppliers.*" title="Supplier">
         <x-sidebar-menu-dropdown-item-dashboard routeName="admin.suppliers.index" title="Daftar Supplier" />

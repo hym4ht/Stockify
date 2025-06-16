@@ -22,8 +22,8 @@ class DashboardController extends Controller
             // Admin dashboard data
             $productCount = Product::count();
 
-            $startDate = $request->input('start_date', \Carbon\Carbon::now()->subDays(30)->toDateString());
-            $endDate = $request->input('end_date', \Carbon\Carbon::now()->toDateString());
+            $startDate = $request->input('start_date', \Carbon\Carbon::now()->subDays(29)->toDateString());
+            $endDate = $request->input('end_date', \Carbon\Carbon::now()->addDay()->toDateString());
 
             $transactionsInCount = StockTransaction::confirmed()->where('type', 'in')
                 ->whereBetween('confirmed_at', [$startDate, $endDate])

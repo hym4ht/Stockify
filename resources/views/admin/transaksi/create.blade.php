@@ -14,7 +14,7 @@
     </div>
     @endif
 
-    <form action="{{ route('admin.stock.store') }}" method="POST" class="bg-white dark:bg-gray-700 p-6 rounded shadow-md max-w-lg">
+    <form action="{{ route('admin.transaksi.store') }}" method="POST" class="bg-white dark:bg-gray-700 p-6 rounded shadow-md max-w-lg">
         @csrf
 
         <div class="mb-4">
