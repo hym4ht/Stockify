@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\Admin\StockOpnameController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
@@ -72,4 +72,5 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('reports/user-activity', [ReportController::class, 'userActivityReport'])->name('reports.user_activity');
     Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
+    Route::resource('stock-opname', StockOpnameController::class);
 });

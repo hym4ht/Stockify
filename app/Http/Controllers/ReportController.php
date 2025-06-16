@@ -11,18 +11,19 @@ use Illuminate\Support\Facades\DB;
 class ReportController extends Controller
 {
     // Stock report per period and category
-    public function stockReport(Request $request)
-    {
-        $query = Product::query();
+   public function stockReport(Request $request)
+        {
+            $query = Product::query();
+             $stockData = StockTransaction::all(); // Sesuaikan dengan model yang digunakan
+            // Filter berdasarkan periode jika ada
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $query->whereBetween('created_at', [$request->start_date, $request->end_date]);
+            }
 
-        if ($request->filled('category_id')) {
-            $query->where('category_id', $request->category_id);
+            $products = $query->get();
+
+            return view('admin.reports.stock', compact('products','stockData'));
         }
-
-        $products = $query->with('category')->get();
-
-        return view('admin.reports.stock', compact('products'));
-    }
 
     // Transaction report for stock in/out per period
     public function transactionReport(Request $request)

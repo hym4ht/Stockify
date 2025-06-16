@@ -85,15 +85,7 @@ class ProductService
 
     protected function validate(array $data, int $productId = null)
     {
-        $rules = [
-            'name' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id',
-            'supplier_id' => 'required|exists:suppliers,id',
-            'sku' => 'nullable|string|unique:products,sku' . ($productId ? ',' . $productId : ''),
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
-        ];
+       
 
         $validator = Validator::make($data, $rules);
 
