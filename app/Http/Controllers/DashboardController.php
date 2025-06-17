@@ -101,6 +101,7 @@ class DashboardController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->get();
 
+
             return view('staf.dashboard', compact('pendingIncoming', 'pendingOutgoing', 'pendingOpname'));
         } else {
             // Default dashboard or redirect
