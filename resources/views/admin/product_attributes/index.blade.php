@@ -14,14 +14,14 @@
     </div>
     @endif
 
-    <table class="min-w-full bg-white border border-gray-200">
+    <table class="w-full border-collapse bg-white text-left text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-400">
         <thead>
             <tr>
-                <th class="py-2 px-4 border-b">ID</th>
-                <th class="py-2 px-4 border-b">Product</th>
-                <th class="py-2 px-4 border-b">Attribute Name</th>
-                <th class="py-2 px-4 border-b">Attribute Value</th>
-                <th class="py-2 px-4 border-b">Actions</th>
+                <th class="px-6 py-4 font-medium text-gray-900 dark:text-white">ID</th>
+                <th class="px-6 py-4 font-medium text-gray-900 dark:text-white">Product</th>
+                <th class="px-6 py-4 font-medium text-gray-900 dark:text-white">Attribute Name</th>
+                <th class="px-6 py-4 font-medium text-gray-900 dark:text-white">Attribute Value</th>
+                <th class="px-6 py-4 font-medium text-gray-900 dark:text-white">Actions</th>
             </tr>
         </thead>
         <tbody>

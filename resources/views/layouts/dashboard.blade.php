@@ -53,7 +53,7 @@
 @php
     $whiteBg = isset($params['white_bg']) && $params['white_bg'];
 @endphp
-<body class="{{ $whiteBg ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800' }}">
+<body class="{{ $whiteBg ? 'bg-white dark:bg-gray-900 text-black dark:text-white' : 'bg-gray-50 dark:bg-gray-800 text-black dark:text-white' }}">
     <x-navbar-dashboard/>
     <div class="flex pt-16 overflow-hidden bg-gray-50 dark:bg-gray-900">
         @php

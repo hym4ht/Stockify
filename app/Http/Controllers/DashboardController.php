@@ -35,7 +35,6 @@ class DashboardController extends Controller
 
             $recentActivities = StockTransaction::confirmed()->with('user', 'product')
                 ->orderBy('confirmed_at', 'desc')
-            
                 ->limit(10)
                 ->get();
                 

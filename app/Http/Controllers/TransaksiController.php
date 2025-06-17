@@ -54,7 +54,7 @@ class TransaksiController extends Controller
         // Do NOT update product stock here; stock will be updated on confirmation
 
         $today = date('Y-m-d');
-        return redirect()->route('admin.dashboard', ['start_date' => $today, 'end_date' => $today])->with('success', 'Stock transaction recorded successfully.');
+        return redirect()->route('admin.transaksi.index')->with('success', 'Stock transaction recorded successfully.');
     }
 
     // Confirm stock transaction (receipt or issuance) by staf gudang
