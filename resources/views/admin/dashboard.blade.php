@@ -6,17 +6,26 @@
     <p>Selamat datang di dashboard Admin. Di sini Anda dapat mengelola produk, stok, pengguna, dan laporan.</p>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <h2 class="text-lg font-medium text-gray-700 dark:text-gray-300">Total Products</h2>
-            <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ $productCount }}</p>
+        <div class="rounded-xl shadow-xl p-8 flex flex-col justify-center hover:scale-105 transition-transform duration-300 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700">
+            <h2 class="text-lg font-medium text-gray-700 dark:text-gray-300 flex items-center space-x-3">
+                <span class="text-2xl">📦</span>
+                <span>Total Products</span>
+            </h2>
+            <p class="text-3xl font-bold text-gray-900 dark:text-white mt-auto">{{ $productCount }}</p>
         </div>
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <h2 class="text-lg font-medium text-gray-700 dark:text-gray-300">Transactions In ({{ $startDate }} - {{ $endDate }})</h2>
-            <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ $transactionsInCount }}</p>
+        <div class="rounded-xl shadow-xl p-8 flex flex-col justify-center hover:scale-105 transition-transform duration-300 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700">
+            <h2 class="text-lg font-medium text-gray-700 dark:text-gray-300 flex items-center space-x-3">
+                <span class="text-2xl">🔄</span>
+                <span>Transactions In ({{ $startDate }} - {{ $endDate }})</span>
+            </h2>
+            <p class="text-3xl font-bold text-gray-900 dark:text-white mt-auto">{{ $transactionsInCount }}</p>
         </div>
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <h2 class="text-lg font-medium text-gray-700 dark:text-gray-300">Transactions Out ({{ $startDate }} - {{ $endDate }})</h2>
-            <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ $transactionsOutCount }}</p>
+        <div class="rounded-xl shadow-xl p-8 flex flex-col justify-center hover:scale-105 transition-transform duration-300 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700">
+            <h2 class="text-lg font-medium text-gray-700 dark:text-gray-300 flex items-center space-x-3">
+                <span class="text-2xl">📤</span>
+                <span>Transactions Out ({{ $startDate }} - {{ $endDate }})</span>
+            </h2>
+            <p class="text-3xl font-bold text-gray-900 dark:text-white mt-auto">{{ $transactionsOutCount }}</p>
         </div>
     </div>
 
@@ -65,6 +74,7 @@
                     <th class="py-2 px-4 border-b text-gray-900 dark:text-white text-center">Type</th>
                     <th class="py-2 px-4 border-b text-gray-900 dark:text-white text-center">Quantity</th>
                     <th class="py-2 px-2 border-b text-gray-900 dark:text-white text-center">Date</th>
+                    <th class="py-2 px-2 border-b text-gray-900 dark:text-white text-center">Confirmed By</th>
                     <th class="py-2 px-10 border-b text-gray-900 dark:text-white text-center">Barang Fisik</th>
                     <th class="py-2 px-20 border-b text-gray-900 dark:text-white text-center">Barang Rusak/Hilang</th>
                 </tr>
@@ -77,6 +87,7 @@
                     <td class="py-2 px-4 border-b text-gray-700 dark:text-gray-300 text-center align-middle">{{ ucfirst($activity->type) }}</td>
                     <td class="py-2 px-4 border-b text-gray-700 dark:text-gray-300 text-center align-middle">{{ $activity->quantity }}</td>
                     <td class="py-2 px-4 border-b text-gray-700 dark:text-gray-300 text-center align-middle">{{ $activity->created_at->format('Y-m-d H:i') }}</td>
+                    <td class="py-2 px-4 border-b text-gray-700 dark:text-gray-300 text-center align-middle">{{ $activity->confirmedBy->name ?? 'N/A' }}</td>
                     <td class="py-2 px-10 border-b text-gray-700 dark:text-gray-300 text-center align-middle">{{ $activity->physical_count }}</td>
                     <td class="py-2 px-20 border-b text-gray-700 dark:text-gray-300 text-center align-middle">{{ $activity->damaged_lost_goods }}</td>
                 </tr>

@@ -56,7 +56,7 @@ Route::get('/password/reset', [AuthController::class, 'showResetForm'])->name('p
 Route::post('/password/reset', [AuthController::class, 'resetPassword'])->name('password.update');
 
 Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-
+Route::get('/manager/dashboard', [DashboardController::class, 'index'])->name('manager.dashboard');
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -77,6 +77,10 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
     Route::get('reports/user-activity', [ReportController::class, 'userActivityReport'])->name('reports.user_activity');
     Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
+});
+    Route::middleware(['auth', 'role:ManajerGudang'])->prefix('manager')->name('manager.')->group(function () {
+    // Contoh rute untuk manager
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 });
 
 // Route for staf gudang to confirm stock transactions

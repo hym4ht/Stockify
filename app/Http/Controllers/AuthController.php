@@ -56,16 +56,18 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
+if (Auth::attempt($credentials, $request->boolean('remember'))) {
+    $request->session()->regenerate();
 
-            $user = Auth::user();
-            if ($user->role === 'Admin') {
-                return Redirect::intended('/admin/dashboard');
-            }
+    $user = Auth::user();
+    if ($user->role === 'Admin') {
+        return Redirect::intended('/admin/dashboard');
+    } elseif ($user->role === 'Manajer Gudang') {
+        return Redirect::intended('/manager/dashboard');
+    }
 
-            return Redirect::intended('/dashboard'); // Adjust redirect as needed
-        }
+    return Redirect::intended('/dashboard'); // Adjust redirect as needed
+}
 
         return Redirect::back()
             ->withErrors([

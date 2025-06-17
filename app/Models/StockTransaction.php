@@ -32,7 +32,10 @@ class StockTransaction extends Model
     {
         return $this->belongsTo(User::class);
     }
-
+    public function confirmedBy() 
+    {
+    return $this->belongsTo(User::class, 'confirmed_by'); // Menghubungkan ke user yang mengkonfirmasi
+    }   
     /**
      * Scope a query to only include confirmed transactions.
      */

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Role;
 use App\Models\Product;
 use App\Models\StockTransaction;
 use App\Models\User;
@@ -12,18 +13,14 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        // Since role-based access is handled by middleware, no need to check role here
-        // You can customize dashboard data per role if needed by separate controllers or views
-
-        // For example, just redirect to admin dashboard or staf dashboard based on role
         $user = $request->user();
 
         if ($user->role === 'Admin') {
             // Admin dashboard data
             $productCount = Product::count();
 
-            $startDate = $request->input('start_date', \Carbon\Carbon::now()->subDays(29)->toDateString());
-            $endDate = $request->input('end_date', \Carbon\Carbon::now()->addDay()->toDateString());
+            $startDate = $request->input('start_date', Carbon::now()->subDays(29)->toDateString());
+            $endDate = $request->input('end_date', Carbon::now()->addDay()->toDateString());
 
             $transactionsInCount = StockTransaction::confirmed()->where('type', 'in')
                 ->whereBetween('confirmed_at', [$startDate, $endDate])
@@ -33,11 +30,10 @@ class DashboardController extends Controller
                 ->whereBetween('confirmed_at', [$startDate, $endDate])
                 ->count();
 
-            $recentActivities = StockTransaction::confirmed()->with('user', 'product')
+            $recentActivities = StockTransaction::confirmed()->with('user', 'product', 'confirmedBy')
                 ->orderBy('confirmed_at', 'desc')
                 ->limit(10)
                 ->get();
-                
 
             $stockData = StockTransaction::confirmed()->selectRaw('DATE(confirmed_at) as date, type, SUM(quantity) as total_quantity')
                 ->whereBetween('confirmed_at', [$startDate, $endDate])
@@ -84,7 +80,59 @@ class DashboardController extends Controller
                 'stockOutData',
                 'stockSummary'
             ));
-        } elseif ($user->role === 'Staff Gudang') {
+        }
+        elseif (str_contains($user->role, 'Manajer')) {
+            // Data khusus untuk dashboard manager
+            $productCount = Product::where('stock', '<', 10)->count();
+            
+            $todayStart = Carbon::today();
+            $todayEnd = Carbon::today()->endOfDay();
+            
+            $transactionsInCount = StockTransaction::where('type', 'in')
+                ->whereBetween('created_at', [$todayStart, $todayEnd])
+                ->count();
+            
+            $transactionsOutCount = StockTransaction::where('type', 'out')
+                ->whereBetween('created_at', [$todayStart, $todayEnd])
+                ->count();
+
+            // Data untuk grafik (7 hari terakhir)
+            $dates = collect();
+            $stockInData = collect();
+            $stockOutData = collect();
+            
+            for ($i = 6; $i >= 0; $i--) {
+                $date = Carbon::today()->subDays($i);
+                $dates->push($date->format('d M'));
+                
+                $start = $date->copy()->startOfDay();
+                $end = $date->copy()->endOfDay();
+                
+                $stockInData->push(
+                    StockTransaction::where('type', 'in')
+                        ->whereBetween('created_at', [$start, $end])
+                        ->count()
+                );
+                
+                $stockOutData->push(
+                    StockTransaction::where('type', 'out')
+                        ->whereBetween('created_at', [$start, $end])
+                        ->count()
+                );
+            }
+            
+            return view('manager.dashboard', [
+                'productCount' => $productCount,
+                'transactionsInCount' => $transactionsInCount,
+                'transactionsOutCount' => $transactionsOutCount,
+                'startDate' => $todayStart->format('d M Y'),
+                'endDate' => $todayEnd->format('d M Y'),
+                'dates' => $dates->toArray(),
+                'stockInData' => $stockInData->toArray(),
+                'stockOutData' => $stockOutData->toArray(),
+            ]);
+        }
+        elseif ($user->role === 'Staff Gudang') {
             // Staf Gudang dashboard data with pending tasks
             $pendingIncoming = StockTransaction::where('type', 'in')
                 ->where('status', 'pending')
@@ -100,7 +148,6 @@ class DashboardController extends Controller
                 ->where('status', 'pending')
                 ->orderBy('created_at', 'desc')
                 ->get();
-
 
             return view('staf.dashboard', compact('pendingIncoming', 'pendingOutgoing', 'pendingOpname'));
         } else {

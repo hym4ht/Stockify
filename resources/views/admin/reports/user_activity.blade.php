@@ -35,6 +35,7 @@
                 <th class="py-2 px-4 border-b text-gray-900 dark:text-white">Type</th>
                 <th class="py-2 px-4 border-b text-gray-900 dark:text-white">Quantity</th>
                 <th class="py-2 px-4 border-b text-gray-900 dark:text-white">Status</th>
+                <th class="py-2 px-4 border-b text-gray-900 dark:text-white">Confirmed By</th>
                 <th class="py-2 px-4 border-b text-gray-900 dark:text-white">Date</th>
             </tr>
         </thead>
@@ -46,6 +47,7 @@
                 <td class="py-2 px-4 border-b text-gray-700 dark:text-gray-300">{{ ucfirst($activity->type) }}</td>
                 <td class="py-2 px-4 border-b text-gray-700 dark:text-gray-300">{{ $activity->quantity }}</td>
                 <td class="py-2 px-4 border-b text-gray-700 dark:text-gray-300">{{ ucfirst($activity->status) }}</td>
+                <td class="py-2 px-4 border-b text-gray-700 dark:text-gray-300">{{ $activity->confirmedBy->name ?? 'N/A' }}</td>
                 <td class="py-2 px-4 border-b text-gray-700 dark:text-gray-300">{{ $activity->created_at->format('Y-m-d H:i') }}</td>
             </tr>
             @endforeach
