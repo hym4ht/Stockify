@@ -69,6 +69,8 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('transaksi', TransaksiController::class);
     Route::resource('users', UserController::class);
     Route::get('users', [UserController::class, 'index'])->name('users.index');
+    Route::get('users/export/csv', [UserController::class, 'exportCsv'])->name('users.export.csv');
+    Route::get('users/export/excel', [UserController::class, 'exportExcel'])->name('users.export.excel');
     Route::resource('product_attributes', ProductAttributeController::class);
     Route::get('reports/stock', [ReportController::class, 'stockReport'])->name('reports.stock');
     Route::get('reports/transactions', [ReportController::class, 'transactionReport'])->name('reports.transactions');

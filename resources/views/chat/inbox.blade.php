@@ -3,10 +3,6 @@
 @section('content')
 <div class="container mx-auto p-4">
     <h1 class="text-2xl font-bold mb-4">Inbox</h1>
-    <div class="mb-4">
-        <input type="text" id="userSearch" placeholder="Search users to chat..." class="border p-2 rounded w-full" autocomplete="off" />
-        <div id="searchResults" class="border rounded mt-1 max-h-48 overflow-y-auto hidden"></div>
-    </div>
     <div class="flex space-x-4">
         <div class="w-1/3 border rounded p-4 max-h-[500px] overflow-y-auto">
             <h2 class="text-xl font-semibold mb-2">Users</h2>

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Exports\UserExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends Controller
 {
@@ -69,5 +71,17 @@ class UserController extends Controller
         $user->delete();
 
         return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
+    }
+
+    // Export users to CSV
+    public function exportCsv()
+    {
+        return Excel::download(new UserExport, 'users.csv', \Maatwebsite\Excel\Excel::CSV);
+    }
+
+    // Export users to Excel
+    public function exportExcel()
+    {
+        return Excel::download(new UserExport, 'users.xlsx', \Maatwebsite\Excel\Excel::XLSX);
     }
 }
