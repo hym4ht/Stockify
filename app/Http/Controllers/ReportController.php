@@ -60,7 +60,7 @@ class ReportController extends Controller
     // User activity report
     public function userActivityReport(Request $request)
     {
-        $query = StockTransaction::with(['user', 'product']);
+        $query = StockTransaction::with(['user', 'product', 'confirmedBy']);
 
         if ($request->filled('user_id')) {
             $query->where('user_id', $request->user_id);
@@ -68,6 +68,10 @@ class ReportController extends Controller
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
+        }
+
+        if ($request->filled('confirmed_by')) {
+            $query->where('confirmed_by', $request->confirmed_by);
         }
 
         $activities = $query->get();

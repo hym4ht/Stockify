@@ -137,10 +137,7 @@
                             <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ $user->country ?? '-' }}</td>
                             <td class="p-4 text-base font-normal text-gray-900 whitespace-nowrap dark:text-white">
                                 <div class="flex items-center">
-                                    @if($user->hasRole('unconfirmed'))
-                                    <div class="h-2.5 w-2.5 rounded-full bg-yellow-400 mr-2"></div>
-                                    Menunggu Konfirmasi
-                                    @elseif($user->hasRole('Admin'))
+                                    @if($user->hasRole('Admin'))
                                     <div class="h-2.5 w-2.5 rounded-full bg-blue-400 mr-2"></div>
                                     Admin
                                     @elseif($user->hasRole('Staff Gudang'))

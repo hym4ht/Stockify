@@ -7,11 +7,25 @@ use Illuminate\Support\Facades\Storage;
 
 class SettingController extends Controller
 {
-    // Show settings form
-    public function index()
+    // Show settings form for Admin
+    public function adminSettings()
     {
-        $settings = config('app.settings', []);
-        return view('admin.settings.index', compact('settings'));
+        $user = auth()->user();
+        return view('admin.settings.index', compact('user'));
+    }
+
+    // Show settings form for Manager
+    public function managerSettings()
+    {
+        $user = auth()->user();
+        return view('manager.settings.index', compact('user'));
+    }
+
+    // Show settings form for Staff
+    public function staffSettings()
+    {
+        $user = auth()->user();
+        return view('staf.settings.index', compact('user'));
     }
 
     // Update settings
@@ -33,6 +47,16 @@ class SettingController extends Controller
         // Example: save to a JSON file in storage
         Storage::put('settings.json', json_encode($validated));
 
-        return redirect()->route('admin.settings.index')->with('success', 'Settings updated successfully.');
+        // Redirect back based on user role
+        $user = auth()->user();
+        if ($user->role === 'Admin') {
+            return redirect()->route('admin.settings.index')->with('success', 'Settings updated successfully.');
+        } elseif ($user->role === 'Manajer Gudang') {
+            return redirect()->route('manager.settings.index')->with('success', 'Settings updated successfully.');
+        } elseif ($user->role === 'Staff Gudang') {
+            return redirect()->route('staf.settings.index')->with('success', 'Settings updated successfully.');
+        } else {
+            return redirect()->route('settings.index')->with('success', 'Settings updated successfully.');
+        }
     }
 }

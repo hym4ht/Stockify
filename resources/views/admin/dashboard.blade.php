@@ -37,7 +37,7 @@
             <canvas id="stockChart" class="w-full h-96"></canvas>
             <div class="mt-2 flex space-x-4 text-sm font-medium text-gray-600 dark:text-gray-300">
                 <div class="flex items-center space-x-1">
-                    <span class="block w-4 h-4 bg-green-500 rounded"></span>
+                    <span class="block w-4 h-4 bg-blue-500 rounded"></span>
                     <span>Stock In</span>
                 </div>
                 <div class="flex items-center space-x-1">
@@ -69,7 +69,7 @@
         <table class="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow text-center align-middle">
             <thead>
                 <tr>
-                    <th class="py-2 px-4 border-b text-gray-900 dark:text-white text-center">User</th>
+                    <th class="py-2 px-4 border-b text-gray-900 dark:text-white text-center">Created By</th>
                     <th class="py-2 px-4 border-b text-gray-900 dark:text-white text-center">Product</th>
                     <th class="py-2 px-4 border-b text-gray-900 dark:text-white text-center">Type</th>
                     <th class="py-2 px-4 border-b text-gray-900 dark:text-white text-center">Quantity</th>
@@ -96,67 +96,81 @@
         </table>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const dates = @json($dates);
-            const stockInData = @json(array_values($stockInData));
-            const stockOutData = @json(array_values($stockOutData));
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const dates = JSON.parse('{!! addslashes(json_encode($dates)) !!}');
+                    const stockInData = JSON.parse('{!! addslashes(json_encode(array_values($stockInData))) !!}');
+                    const stockOutData = JSON.parse('{!! addslashes(json_encode(array_values($stockOutData))) !!}');
 
-            const ctx = document.getElementById('stockChart').getContext('2d');
-            const stockChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: dates,
-                    datasets: [
-                        {
-                            label: 'Stock In',
-                            data: stockInData,
-                            borderColor: 'rgba(34, 197, 94, 1)',
-                            backgroundColor: 'rgba(34, 197, 94, 0.2)',
-                            fill: true,
-                            tension: 0.3,
-                            pointRadius: 3,
-                            pointHoverRadius: 6,
+                    const ctx = document.getElementById('stockChart').getContext('2d');
+
+                    // Create gradient fills for the datasets
+                    const gradientBlue = ctx.createLinearGradient(0, 0, 0, 400);
+                    gradientBlue.addColorStop(0, 'rgba(0, 123, 255, 0.9)');
+                    gradientBlue.addColorStop(0.5, 'rgba(0, 123, 255, 0.4)');
+                    gradientBlue.addColorStop(1, 'rgba(0, 123, 255, 0)');
+
+                    const gradientRed = ctx.createLinearGradient(0, 0, 0, 400);
+                    gradientRed.addColorStop(0, 'rgba(220, 38, 38, 0.9)');
+                    gradientRed.addColorStop(0.5, 'rgba(220, 38, 38, 0.5)');
+                    gradientRed.addColorStop(1, 'rgba(220, 38, 38, 0)');
+
+                    const stockChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: dates,
+                            datasets: [
+                                {
+                                    label: 'Stock In',
+                                    data: stockInData,
+                                    borderColor: 'rgb(0, 192, 246)',
+                                    backgroundColor: gradientBlue,
+                                    fill: true,
+                                    tension: 0,
+                                    pointRadius: 3,
+                                    pointHoverRadius: 6,
+                                    borderWidth: 2
+                                },
+                                {
+                                    label: 'Stock Out',
+                                    data: stockOutData,
+                                    borderColor: 'rgba(239, 68, 68, 1)',
+                                    backgroundColor: gradientRed,
+                                    fill: true,
+                                    tension: 0,
+                                    pointRadius: 3,
+                                    pointHoverRadius: 6,
+                                    borderWidth: 2
+                                }
+                            ]
                         },
-                        {
-                            label: 'Stock Out',
-                            data: stockOutData,
-                            borderColor: 'rgba(239, 68, 68, 1)',
-                            backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                            fill: true,
-                            tension: 0.3,
-                            pointRadius: 3,
-                            pointHoverRadius: 6,
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    interaction: {
-                        mode: 'nearest',
-                        intersect: false
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            enabled: true,
-                            mode: 'index',
-                            intersect: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: 1
+                        options: {
+                            responsive: true,
+                            interaction: {
+                                mode: 'nearest',
+                                intersect: false
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    enabled: true,
+                                    mode: 'index',
+                                    intersect: false
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1
+                                    }
+                                }
                             }
                         }
-                    }
-                }
-            });
-        });
-    </script>
+                    });
+                });
+            </script>
 </div>
 @endsection

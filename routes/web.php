@@ -75,19 +75,18 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
     Route::get('reports/stock', [ReportController::class, 'stockReport'])->name('reports.stock');
     Route::get('reports/transactions', [ReportController::class, 'transactionReport'])->name('reports.transactions');
     Route::get('reports/user-activity', [ReportController::class, 'userActivityReport'])->name('reports.user_activity');
-    Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
+    Route::get('settings', [SettingController::class, 'adminSettings'])->name('settings.index');
     Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
 });
-    Route::middleware(['auth', 'role:ManajerGudang'])->prefix('manager')->name('manager.')->group(function () {
+Route::middleware(['auth', 'role:ManajerGudang'])->prefix('manager')->name('manager.')->group(function () {
     // Contoh rute untuk manager
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('settings', [SettingController::class, 'managerSettings'])->name('settings.index');
+    Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
 });
 
-// Route for staf gudang to confirm stock transactions
 Route::middleware(['auth'])->group(function () {
-    // Route::post('/staf/confirm/{id}', [TransaksiController::class, 'confirmTransaction'])->name('staf.confirm');
-
-    // Stock opname routes for staff gudang
+    // Stock opname routes accessible to all authenticated users
     Route::get('/stock/opname', [TransaksiController::class, 'opnameIndex'])->name('stock.opname.index');
     Route::get('/stock/opname/masuk', [TransaksiController::class, 'opnameMasuk'])->name('stock.opname.masuk');
     // Route::get('/stock/opname/masuk/create', [TransaksiController::class, 'createOpnameMasuk'])->name('stock.opname.masuk.create');
@@ -102,7 +101,15 @@ Route::middleware(['auth'])->group(function () {
     });
     Route::get('/stock', [TransaksiController::class, 'index'])->name('stock.index');
 
-    // Chat routes
+    // Staff settings routes remain under 'staf' prefix and middleware
+    Route::middleware(['role:StaffGudang'])->prefix('staf')->name('staf.')->group(function () {
+        Route::get('settings', [SettingController::class, 'staffSettings'])->name('settings.index');
+        Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
+    });
+});
+
+Route::middleware(['auth'])->group(function () {
+    // Chat routes accessible to all authenticated users
     Route::get('/chat/inbox', [ChatController::class, 'inbox'])->name('chat.inbox');
     Route::get('/chat/{userId}', [ChatController::class, 'chat'])->name('chat.chat');
     Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
