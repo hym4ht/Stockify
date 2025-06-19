@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CalendarController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
@@ -43,6 +44,11 @@ Route::name('practice.')->group(function () {
 Route::get('/register', function () {
     return view('example.content.authentication.sign-up');
 })->name('register');
+
+Route::get('/calendar', function () {
+    return view('example.content.calendar.index');
+})->name('calendar');
+Route::post('/calendar', [CalendarController::class, 'calendar'])->name(name: 'calendar.post');
 
 // Auth routes
 Route::post('/register', [AuthController::class, 'register'])->name('register.post');

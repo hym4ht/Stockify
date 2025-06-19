@@ -19,7 +19,7 @@
                     <tr>
                         <td class="py-1 px-3 border-b">{{ $product->name }}</td>
                         <td class="py-1 px-3 border-b">{{ $product->category->name ?? 'Tidak ada kategori' }}</td>
-                        <td class="py-1 px-3 border-b text-right">{{ $product->remaining_stock }}</td>
+                        <td class="py-1 px-3 border-b text-right">{{ $product->stock }}</td>
                     </tr>
                 @endforeach
             </tbody>

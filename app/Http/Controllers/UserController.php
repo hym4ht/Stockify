@@ -13,7 +13,7 @@ class UserController extends Controller
     // Display a listing of users
     public function index()
     {
-        $users = User::paginate(15);
+        $users = User::paginate(5);
         return view('admin.users.index', compact('users'));
     }
 

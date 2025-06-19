@@ -260,7 +260,7 @@ class TransaksiController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->role !== 'Staff Gudang') {
+        if ($user->role !== 'Staff Gudang' && $user->role !== 'Manajer Gudang') {
             abort(403, 'Unauthorized action.');
         }
 
@@ -292,7 +292,7 @@ class TransaksiController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->role !== 'Staff Gudang') {
+        if ($user->role !== 'Staff Gudang' && $user->role !== 'Manajer Gudang') {
             abort(403, 'Unauthorized action.');
         }
 

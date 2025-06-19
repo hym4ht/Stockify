@@ -31,11 +31,6 @@ class ReportController extends Controller
             ->get()
             ->groupBy('product_id');
 
-        foreach ($products as $product) {
-            $stockIn = $stockSums->has($product->id) ? $stockSums[$product->id]->where('type', 'in')->sum('total_quantity') : 0;
-            $stockOut = $stockSums->has($product->id) ? $stockSums[$product->id]->where('type', 'out')->sum('total_quantity') : 0;
-            $product->setAttribute('remaining_stock', $stockIn - $stockOut);
-        }
 
         return view('admin.reports.stock', compact('products'));
     }

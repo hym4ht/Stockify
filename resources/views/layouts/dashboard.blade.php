@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,8 +8,8 @@
     <meta name="author" content="#">
     <meta name="generator" content="Laravel">
 
-    <title>Dashboard - </title>
-    @vite(['resources/css/app.css','resources/js/app.js'])
+    <title>Dashboard </title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="canonical" href="{{ request()->fullUrl() }}">
 
     @if(isset($page->params['robots']))
@@ -17,7 +18,8 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-icon-180x180.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
@@ -54,18 +56,22 @@
 @php
     $whiteBg = isset($params['white_bg']) && $params['white_bg'];
 @endphp
-<body class="{{ $whiteBg ? 'bg-white dark:bg-gray-900 text-black dark:text-white' : 'bg-gray-50 dark:bg-gray-800 text-black dark:text-white' }}">
-    <x-navbar-dashboard/>
+
+<body
+    class="{{ $whiteBg ? 'bg-white dark:bg-gray-900 text-black dark:text-white' : 'bg-gray-50 dark:bg-gray-800 text-black dark:text-white' }}">
+    <x-navbar-dashboard />
     <div class="flex pt-16 overflow-hidden bg-gray-50 dark:bg-gray-900">
         @php
             $user = auth()->user();
         @endphp
         @if($user && $user->role === 'Admin')
-            <x-sidebar.admin-sidebar/>
+            <x-sidebar.admin-sidebar />
         @elseif($user && $user->role === 'Staff Gudang')
-            <x-sidebar.staf-sidebar/>
+            <x-sidebar.staf-sidebar />
+        @elseif($user && $user->role === 'Manajer Gudang')
+            <x-sidebar.manager-sidebar />
         @else
-            <x-sidebar.admin-sidebar/>
+            <x-sidebar.admin-sidebar />
         @endif
         <div id="main-content" class="relative w-full h-full overflow-y-auto bg-gray-50 lg:ml-64 dark:bg-gray-900">
             <main>
@@ -77,4 +83,5 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.2/datepicker.min.js"></script>
 </body>
+
 </html>
