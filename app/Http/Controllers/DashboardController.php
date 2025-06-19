@@ -34,8 +34,7 @@ class DashboardController extends Controller
 
             $recentActivities = StockTransaction::confirmed()->with('user', 'product', 'confirmedBy')
                 ->orderBy('confirmed_at', 'desc')
-                ->limit(10)
-                ->get();
+                ->paginate(5);
 
             $stockDataQuery = StockTransaction::confirmed()
                 ->selectRaw('DATE(confirmed_at) as date, type, SUM(quantity) as total_quantity')
@@ -117,18 +116,17 @@ class DashboardController extends Controller
                 'productNameFilter',
                 'productNames'
             ));
-        }
-        elseif (str_contains($user->role, 'Manajer')) {
+        } elseif (str_contains($user->role, 'Manajer')) {
             // Data khusus untuk dashboard manager
             $productCount = Product::where('stock', '<', 10)->count();
-            
+
             $todayStart = Carbon::today();
             $todayEnd = Carbon::today()->endOfDay();
-            
+
             $transactionsInCount = StockTransaction::where('type', 'in')
                 ->whereBetween('created_at', [$todayStart, $todayEnd])
                 ->count();
-            
+
             $transactionsOutCount = StockTransaction::where('type', 'out')
                 ->whereBetween('created_at', [$todayStart, $todayEnd])
                 ->count();
@@ -136,18 +134,18 @@ class DashboardController extends Controller
             // Data untuk grafik (hari ini saja)
             $dates = collect();
             $stockInData = collect();
-            
+
             $end = Carbon::now();
             $start = Carbon::now()->subDay();
-            
+
             $dates->push($start->format('d M H:i') . ' - ' . $end->format('d M H:i'));
-            
+
             $stockInData->push(
                 StockTransaction::where('type', 'in')
                     ->whereBetween('created_at', [$start, $end])
                     ->count()
             );
-            
+
             return view('manager.dashboard', [
                 'productCount' => $productCount,
                 'transactionsInCount' => $transactionsInCount,
@@ -158,8 +156,7 @@ class DashboardController extends Controller
                 'stockInData' => $stockInData->toArray(),
                 'stockOutData' => [], // empty array since not used
             ]);
-        }
-        elseif ($user->role === 'Staff Gudang') {
+        } elseif ($user->role === 'Staff Gudang') {
             // Staf Gudang dashboard data with pending tasks
             $pendingIncoming = StockTransaction::where('type', 'in')
                 ->where('status', 'pending')

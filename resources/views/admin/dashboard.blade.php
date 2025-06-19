@@ -32,19 +32,19 @@
 
         <div class="mb-6">
             <form method="GET" action="{{ route('admin.dashboard') }}" class="flex flex-wrap gap-4 items-center">
-                <div>
+                <div class="w-full sm:w-auto">
                     <label for="start_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Start
                         Date:</label>
                     <input type="date" id="start_date" name="start_date" value="{{ $startDate }}"
                         class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-300 focus:ring-opacity-50">
                 </div>
-                <div>
+                <div class="w-full sm:w-auto">
                     <label for="end_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">End
                         Date:</label>
                     <input type="date" id="end_date" name="end_date" value="{{ $endDate }}"
                         class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-300 focus:ring-opacity-50">
                 </div>
-                <div>
+                <div class="w-full sm:w-auto">
                     <label for="product_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Product
                         Name:</label>
                     <select id="product_name" name="product_name"
@@ -52,7 +52,8 @@
                         <option value="">All Products</option>
                         @foreach ($productNames as $productName)
                             <option value="{{ $productName }}" @if ($productName === $productNameFilter) selected @endif>
-                                {{ $productName }}</option>
+                                {{ $productName }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
@@ -100,36 +101,48 @@
 
         <div>
             <h2 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Recent User Activities</h2>
-            <table class="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow text-center align-middle">
-                <thead>
-                    <tr>
-                        <th class="py-2 px-2 border-b text-gray-900 dark:text-white text-center">Confirmed By</th>
-                        <th class="py-2 px-4 border-b text-gray-900 dark:text-white text-center">Product</th>
-                        <th class="py-2 px-4 border-b text-gray-900 dark:text-white text-center">Type</th>
-                        <th class="py-2 px-2 border-b text-gray-900 dark:text-white text-center">Date</th>
-                        <th class="py-2 px-4 border-b text-gray-900 dark:text-white text-center">Barang Fisik</th>
-                        <th class="py-2 px-4 border-b text-gray-900 dark:text-white text-center">Barang Rusak/Hilang</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($recentActivities as $activity)
+            <div class="overflow-x-auto rounded-lg shadow">
+                <table class="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow text-center align-middle">
+                    <thead>
                         <tr>
-                            <td class="py-2 px-4 border-b text-gray-700 dark:text-gray-300 text-center align-middle">
-                                {{ $activity->confirmedBy->name ?? 'N/A' }}</td>
-                            <td class="py-2 px-4 border-b text-gray-700 dark:text-gray-300 text-center align-middle">
-                                {{ $activity->product->name ?? 'N/A' }}</td>
-                            <td class="py-2 px-4 border-b text-gray-700 dark:text-gray-300 text-center align-middle">
-                                {{ ucfirst($activity->type) }}</td>
-                            <td class="py-2 px-4 border-b text-gray-700 dark:text-gray-300 text-center align-middle">
-                                {{ $activity->created_at->format('Y-m-d H:i') }}</td>
-                            <td class="py-2 px-4 border-b text-gray-700 dark:text-gray-300 text-center align-middle">
-                                {{ $activity->physical_count }}</td>
-                            <td class="py-2 px-4 border-b text-gray-700 dark:text-gray-300 text-center align-middle">
-                                {{ $activity->damaged_lost_goods }}</td>
+                            <th class="py-2 px-2 border-b text-gray-900 dark:text-white text-center">Confirmed By</th>
+                            <th class="py-2 px-4 border-b text-gray-900 dark:text-white text-center">Product</th>
+                            <th class="py-2 px-4 border-b text-gray-900 dark:text-white text-center">Type</th>
+                            <th class="py-2 px-2 border-b text-gray-900 dark:text-white text-center">Date</th>
+                            <th class="py-2 px-4 border-b text-gray-900 dark:text-white text-center">Barang Fisik</th>
+                            <th class="py-2 px-4 border-b text-gray-900 dark:text-white text-center">Barang Rusak/Hilang
+                            </th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach ($recentActivities as $activity)
+                            <tr>
+                                <td class="py-2 px-4 border-b text-gray-700 dark:text-gray-300 text-center align-middle">
+                                    {{ $activity->confirmedBy->name ?? 'N/A' }}
+                                </td>
+                                <td class="py-2 px-4 border-b text-gray-700 dark:text-gray-300 text-center align-middle">
+                                    {{ $activity->product->name ?? 'N/A' }}
+                                </td>
+                                <td class="py-2 px-4 border-b text-gray-700 dark:text-gray-300 text-center align-middle">
+                                    {{ ucfirst($activity->type) }}
+                                </td>
+                                <td class="py-2 px-4 border-b text-gray-700 dark:text-gray-300 text-center align-middle">
+                                    {{ $activity->created_at->format('Y-m-d H:i') }}
+                                </td>
+                                <td class="py-2 px-4 border-b text-gray-700 dark:text-gray-300 text-center align-middle">
+                                    {{ $activity->physical_count }}
+                                </td>
+                                <td class="py-2 px-4 border-b text-gray-700 dark:text-gray-300 text-center align-middle">
+                                    {{ $activity->damaged_lost_goods }}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-4">
+                {{ $recentActivities->links('pagination::tailwind') }}
+            </div>
         </div>
 
         <script>
@@ -180,7 +193,7 @@
                             }
                         ]
                     },
-                                    options: {
+                    options: {
                         responsive: true,
                         interaction: {
                             mode: 'nearest',
@@ -213,7 +226,7 @@
                         }
                     }
 
-                            });
+                });
 
                 // Pie chart data
                 const pieCtx = document.getElementById('stockInfoPieChart').getContext('2d');
@@ -234,7 +247,7 @@
                         labels: ['Physical Count', 'Damaged/Lost Goods'],
                         datasets: [{
                             data: [totalPhysicalCount, totalDamagedLostGoods],
-                            backgroundColor: ['#22c55e', '#eab308'], // green and yellow
+                            backgroundColor: ['#0FFF50', '#FF5733'],
                             hoverOffset: 40
                         }]
                     },
