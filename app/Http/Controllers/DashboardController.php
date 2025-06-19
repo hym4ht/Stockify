@@ -22,6 +22,8 @@ class DashboardController extends Controller
             $startDate = $request->input('start_date', Carbon::now()->subDays(29)->toDateString());
             $endDate = $request->input('end_date', Carbon::now()->addDay()->toDateString());
 
+            $productNameFilter = $request->input('product_name', null);
+
             $transactionsInCount = StockTransaction::confirmed()->where('type', 'in')
                 ->whereBetween('confirmed_at', [$startDate, $endDate])
                 ->count();
@@ -35,9 +37,17 @@ class DashboardController extends Controller
                 ->limit(10)
                 ->get();
 
-            $stockData = StockTransaction::confirmed()->selectRaw('DATE(confirmed_at) as date, type, SUM(quantity) as total_quantity')
-                ->whereBetween('confirmed_at', [$startDate, $endDate])
-                ->groupBy('date', 'type')
+            $stockDataQuery = StockTransaction::confirmed()
+                ->selectRaw('DATE(confirmed_at) as date, type, SUM(quantity) as total_quantity')
+                ->whereBetween('confirmed_at', [$startDate, $endDate]);
+
+            if ($productNameFilter) {
+                $stockDataQuery->whereHas('product', function ($query) use ($productNameFilter) {
+                    $query->where('name', 'like', '%' . $productNameFilter . '%');
+                });
+            }
+
+            $stockData = $stockDataQuery->groupBy('date', 'type')
                 ->orderBy('date')
                 ->get();
 
@@ -68,6 +78,30 @@ class DashboardController extends Controller
             // Fetch stock summary for sidebar report
             $stockSummary = Product::select('name', 'stock')->orderBy('name')->get();
 
+            // Fetch product names for filter dropdown
+            $productNames = Product::orderBy('name')->pluck('name');
+
+            // New query for pie chart data: physical_count and damaged_lost_goods grouped by product name
+            $pieChartDataQuery = StockTransaction::confirmed()
+                ->selectRaw('product_id, SUM(physical_count) as total_physical_count, SUM(damaged_lost_goods) as total_damaged_lost_goods')
+                ->groupBy('product_id');
+
+            if ($productNameFilter) {
+                $pieChartDataQuery->whereHas('product', function ($query) use ($productNameFilter) {
+                    $query->where('name', 'like', '%' . $productNameFilter . '%');
+                });
+            }
+
+            $pieChartDataRaw = $pieChartDataQuery->with('product')->get();
+
+            $pieChartData = $pieChartDataRaw->map(function ($item) {
+                return [
+                    'product_name' => $item->product->name ?? 'Unknown',
+                    'physical_count' => (int) $item->total_physical_count,
+                    'damaged_lost_goods' => (int) $item->total_damaged_lost_goods,
+                ];
+            });
+
             return view('admin.dashboard', compact(
                 'productCount',
                 'transactionsInCount',
@@ -78,7 +112,10 @@ class DashboardController extends Controller
                 'dates',
                 'stockInData',
                 'stockOutData',
-                'stockSummary'
+                'stockSummary',
+                'pieChartData',
+                'productNameFilter',
+                'productNames'
             ));
         }
         elseif (str_contains($user->role, 'Manajer')) {
@@ -96,30 +133,20 @@ class DashboardController extends Controller
                 ->whereBetween('created_at', [$todayStart, $todayEnd])
                 ->count();
 
-            // Data untuk grafik (7 hari terakhir)
+            // Data untuk grafik (hari ini saja)
             $dates = collect();
             $stockInData = collect();
-            $stockOutData = collect();
             
-            for ($i = 6; $i >= 0; $i--) {
-                $date = Carbon::today()->subDays($i);
-                $dates->push($date->format('d M'));
-                
-                $start = $date->copy()->startOfDay();
-                $end = $date->copy()->endOfDay();
-                
-                $stockInData->push(
-                    StockTransaction::where('type', 'in')
-                        ->whereBetween('created_at', [$start, $end])
-                        ->count()
-                );
-                
-                $stockOutData->push(
-                    StockTransaction::where('type', 'out')
-                        ->whereBetween('created_at', [$start, $end])
-                        ->count()
-                );
-            }
+            $end = Carbon::now();
+            $start = Carbon::now()->subDay();
+            
+            $dates->push($start->format('d M H:i') . ' - ' . $end->format('d M H:i'));
+            
+            $stockInData->push(
+                StockTransaction::where('type', 'in')
+                    ->whereBetween('created_at', [$start, $end])
+                    ->count()
+            );
             
             return view('manager.dashboard', [
                 'productCount' => $productCount,
@@ -129,7 +156,7 @@ class DashboardController extends Controller
                 'endDate' => $todayEnd->format('d M Y'),
                 'dates' => $dates->toArray(),
                 'stockInData' => $stockInData->toArray(),
-                'stockOutData' => $stockOutData->toArray(),
+                'stockOutData' => [], // empty array since not used
             ]);
         }
         elseif ($user->role === 'Staff Gudang') {

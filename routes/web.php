@@ -76,13 +76,13 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
     Route::get('reports/transactions', [ReportController::class, 'transactionReport'])->name('reports.transactions');
     Route::get('reports/user-activity', [ReportController::class, 'userActivityReport'])->name('reports.user_activity');
     Route::get('settings', [SettingController::class, 'adminSettings'])->name('settings.index');
-    Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
+    Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
 });
-Route::middleware(['auth', 'role:ManajerGudang'])->prefix('manager')->name('manager.')->group(function () {
+Route::middleware(['auth', 'role:Manajer Gudang'])->prefix('manager')->name('manager.')->group(function () {
     // Contoh rute untuk manager
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('settings', [SettingController::class, 'managerSettings'])->name('settings.index');
-    Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
+    Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -102,9 +102,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/stock', [TransaksiController::class, 'index'])->name('stock.index');
 
     // Staff settings routes remain under 'staf' prefix and middleware
-    Route::middleware(['role:StaffGudang'])->prefix('staf')->name('staf.')->group(function () {
+    Route::middleware(['role:Staff Gudang'])->prefix('staf')->name('staf.')->group(function () {
         Route::get('settings', [SettingController::class, 'staffSettings'])->name('settings.index');
-        Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
+        Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
     });
 });
 

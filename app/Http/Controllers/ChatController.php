@@ -38,6 +38,12 @@ class ChatController extends Controller
     {
         $authUserId = Auth::id();
 
+        // Mark messages as read where authenticated user is receiver and sender is $userId
+        Message::where('sender_id', $userId)
+            ->where('receiver_id', $authUserId)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
         // Fetch messages between the two users
         $messages = Message::where(function ($query) use ($authUserId, $userId) {
             $query->where('sender_id', $authUserId)->where('receiver_id', $userId);
@@ -46,6 +52,10 @@ class ChatController extends Controller
         })->orderBy('created_at')->get();
 
         $chatUser = User::findOrFail($userId);
+
+        if (request()->ajax()) {
+            return view('chat._messages', compact('messages'))->render();
+        }
 
         return view('chat.chat', compact('messages', 'chatUser'));
     }
@@ -63,6 +73,10 @@ class ChatController extends Controller
             'receiver_id' => $request->receiver_id,
             'message' => $request->message,
         ]);
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true]);
+        }
 
         return redirect()->route('chat.chat', ['userId' => $request->receiver_id]);
     }

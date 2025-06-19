@@ -26,6 +26,7 @@
     <link rel="mask-icon" href="/static/safari-pinned-tab.svg" color="#5bbad5">
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="theme-color" content="#ffffff">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@">
@@ -70,7 +71,6 @@
             <main>
                 @yield('content')
             </main>
-            <x-footer-dashboard/>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

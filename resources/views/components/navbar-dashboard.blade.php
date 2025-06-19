@@ -27,15 +27,10 @@
           class="p-2 text-gray-500 rounded-lg lg:hidden hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
           <span class="sr-only">Search</span>
           <!-- Search icon -->
-          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd"
-              d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-              clip-rule="evenodd"></path>
-          </svg>
         </button>
         <!-- Notifications -->
-        <button type="button" data-dropdown-toggle="notification-dropdown"
-          class="p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700">
+        <button id="notification-button" type="button" data-dropdown-toggle="notification-dropdown"
+          class="relative p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700">
           <span class="sr-only">View notifications</span>
           <!-- Bell icon -->
           <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -43,21 +38,37 @@
               d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z">
             </path>
           </svg>
+          @if($unreadCount > 0)
+          <span
+            class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full transform translate-x-1/2 -translate-y-1/2">
+            {{ $unreadCount }}
+          </span>
+          @endif
         </button>
         <!-- Dropdown menu -->
         <div
-          class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded shadow dark:bg-gray-700 dark:divide-gray-600"
-          id="dropdown-2">
-          <div class="px-4 py-3" role="none">
-            <p class="text-sm text-gray-900 dark:text-white" role="none">
-              {{ auth()->user()->name }}
-            </p>
-          </div>
-          <div class="px-4 py-3" role="none">
-            <p class="text-sm text-gray-900 dark:text-white" role="none">
-              {{ auth()->user()->role }}
-            </p>
-          </div>
+          class="z-50 hidden my-4 max-w-sm text-base list-none bg-white divide-y divide-gray-100 rounded shadow dark:bg-gray-700 dark:divide-gray-600"
+          id="notification-dropdown" data-popper-placement="bottom" style="position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate3d(0px, 48px, 0px);">
+          @if($conversations->count() == 0)
+          <div class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">No new chat notifications</div>
+          @else
+          @foreach($conversations as $userId => $messages)
+          @php
+          $lastMessage = $messages->first();
+          $chatUser = $users[$userId] ?? null;
+          @endphp
+          @if($chatUser)
+          <a href="{{ route('chat.chat', ['userId' => $chatUser->id]) }}"
+            class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-white">
+            <div class="flex justify-between">
+              <div class="font-semibold">{{ $chatUser->name }}</div>
+              <div class="text-xs text-gray-500 dark:text-gray-400">{{ $lastMessage->created_at->diffForHumans() }}</div>
+            </div>
+            <div class="text-sm text-gray-600 dark:text-gray-300 truncate">{{ Str::limit($lastMessage->message, 50) }}</div>
+          </a>
+          @endif
+          @endforeach
+          @endif
         </div>
         <!-- Apps -->
         <button type="button" data-dropdown-toggle="apps-dropdown"

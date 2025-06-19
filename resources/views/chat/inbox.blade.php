@@ -60,10 +60,8 @@
     </div>
 </div>
 
-<script>
+    <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const userSearchInput = document.getElementById('userSearch');
-    const searchResults = document.getElementById('searchResults');
     const chatSection = document.getElementById('chatSection');
     const chatWith = document.getElementById('chatWith');
     const chatMessages = document.getElementById('chatMessages');
@@ -72,45 +70,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const messageInput = document.getElementById('messageInput');
 
     let currentChatUserId = null;
-
-    // Function to fetch and display search results
-    userSearchInput.addEventListener('input', function () {
-        const query = this.value.trim();
-        if (query.length === 0) {
-            searchResults.innerHTML = '';
-            searchResults.classList.add('hidden');
-            return;
-        }
-
-        fetch(`/chat/search-users?query=${encodeURIComponent(query)}`)
-            .then(response => response.json())
-            .then(users => {
-                if (users.length === 0) {
-                    searchResults.innerHTML = '<p class="p-2 text-gray-600">No users found.</p>';
-                } else {
-                    searchResults.innerHTML = users.map(user => `
-                        <div class="p-2 hover:bg-gray-200 cursor-pointer" data-user-id="${user.id}" data-user-name="${user.name}">
-                            ${user.name}
-                        </div>
-                    `).join('');
-                }
-                searchResults.classList.remove('hidden');
-            });
-    });
-
-    // Click on search result to start chat
-    searchResults.addEventListener('click', function (e) {
-        const target = e.target.closest('div[data-user-id]');
-        if (!target) return;
-
-        const userId = target.getAttribute('data-user-id');
-        const userName = target.getAttribute('data-user-name');
-
-        startChat(userId, userName);
-        searchResults.innerHTML = '';
-        searchResults.classList.add('hidden');
-        userSearchInput.value = '';
-    });
 
     // Click on conversation to open chat
     document.querySelectorAll('li[data-user-id]').forEach(item => {
@@ -129,19 +88,15 @@ document.addEventListener('DOMContentLoaded', function () {
         chatMessages.innerHTML = '<p>Loading messages...</p>';
         chatSection.classList.remove('hidden');
 
-        fetch(`/chat/${userId}`)
+        fetch(`/chat/${userId}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
             .then(response => response.text())
             .then(html => {
-                // Extract messages from the chat page HTML
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = html;
-                const messagesDiv = tempDiv.querySelector('#chatMessagesContent');
-                if (messagesDiv) {
-                    chatMessages.innerHTML = messagesDiv.innerHTML;
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                } else {
-                    chatMessages.innerHTML = '<p>No messages found.</p>';
-                }
+                chatMessages.innerHTML = html;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
             });
     }
 
@@ -151,11 +106,13 @@ document.addEventListener('DOMContentLoaded', function () {
         const message = messageInput.value.trim();
         if (!message || !currentChatUserId) return;
 
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
         fetch('/chat/send', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                'X-CSRF-TOKEN': csrfToken
             },
             body: JSON.stringify({
                 receiver_id: currentChatUserId,

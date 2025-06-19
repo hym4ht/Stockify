@@ -25,7 +25,7 @@
                 @forelse ($products as $product)
                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-600">
                     <td class="px-6 py-4">{{ $product->name }}</td>
-                    <td class="px-6 py-4">${{ number_format($product->price, 2) }}</td>
+                    <td class="px-6 py-4">Rp {{ number_format($product->price, 2) }}</td>
                     <td class="px-6 py-4">{{ $product->category->name ?? 'N/A' }}</td>
                     <td class="px-6 py-4 text-center">
                         <a href="{{ route('admin.products.edit', $product->id) }}" class="text-blue-600 hover:underline mr-4">Edit</a>

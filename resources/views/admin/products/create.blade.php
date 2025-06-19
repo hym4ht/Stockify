@@ -66,8 +66,11 @@
 
         <div class="mb-4">
             <label for="price" class="block text-gray-700 font-bold mb-2">Price</label>
-            <input type="number" name="price" id="price" value="{{ old('price') }}" step="0.01" min="0" required
-                class="w-full border border-gray-300 rounded px-3 py-2 @error('price') border-red-500 @enderror" />
+            <div class="flex">
+                <span class="inline-flex items-center px-3 rounded-l border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">Rp</span>
+                <input type="number" name="price" id="price" value="{{ old('price') }}" step="0.01" min="0" required
+                    class="w-full border border-gray-300 rounded-r px-3 py-2 @error('price') border-red-500 @enderror" />
+            </div>
             @error('price')
             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror
