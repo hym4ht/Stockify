@@ -1,1 +1,0 @@
-@include('staf.opname.index')
