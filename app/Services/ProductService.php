@@ -74,14 +74,25 @@ class ProductService
     {
         $products = $this->productRepository->getAll();
 
-        $header = ['name', 'category_id', 'supplier_id', 'sku', 'description', 'price', 'stock'];
+        $header = ['name', 'category', 'supplier', 'sku', 'description', 'price', 'stock', 'attributes'];
         $csv = implode(',', $header) . "\n";
 
         foreach ($products as $product) {
-            $row = [];
-            foreach ($header as $field) {
-                $row[] = '"' . str_replace('"', '""', $product->$field) . '"';
-            }
+            $attributes = $product->attributes->map(function ($attr) {
+                return $attr->name . ': ' . $attr->value;
+            })->implode(', ');
+
+            $row = [
+                '"' . str_replace('"', '""', $product->name) . '"',
+                '"' . str_replace('"', '""', $product->category->name ?? '') . '"',
+                '"' . str_replace('"', '""', $product->supplier->name ?? '') . '"',
+                '"' . str_replace('"', '""', $product->sku) . '"',
+                '"' . str_replace('"', '""', $product->description) . '"',
+                '"' . str_replace('"', '""', $product->price) . '"',
+                '"' . str_replace('"', '""', $product->stock) . '"',
+                '"' . str_replace('"', '""', $attributes) . '"',
+            ];
+
             $csv .= implode(',', $row) . "\n";
         }
 

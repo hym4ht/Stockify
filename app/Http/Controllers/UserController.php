@@ -86,4 +86,11 @@ class UserController extends Controller
     {
         return Excel::download(new UserExport, 'users.xlsx', \Maatwebsite\Excel\Excel::XLSX);
     }
+
+    // Show authenticated user's profile
+    public function profile()
+    {
+        $user = auth()->user();
+        return view('profile.show', compact('user'));
+    }
 }

@@ -21,8 +21,8 @@ class ReportController extends Controller
         }
 
         // Filter by product attribute name and value
-        if ($request->filled('attribute_name') && $request->filled('attribute_value')) {
-            $query->whereHas('productAttributes', function ($q) use ($request) {
+if ($request->filled('attribute_name') && $request->filled('attribute_value')) {
+            $query->whereHas('attributes', function ($q) use ($request) {
                 $q->where('name', $request->attribute_name)
                   ->where('value', $request->attribute_value);
             });

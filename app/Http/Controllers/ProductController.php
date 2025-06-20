@@ -84,33 +84,45 @@ class ProductController extends Controller
         return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully.');
     }
 
+    // Show the specified product
+    public function show(Product $product)
+    {
+        return view('admin.products.show', compact('product'));
+    }
+
     // Show import form
-    public function importForm()
-    {
-        return view('admin.products.import');
-    }
-
-    // Handle import POST request
-    public function import(Request $request)
-    {
-        $request->validate([
-            'file' => 'required|file|mimes:csv,txt',
-        ]);
-
-        $this->productService->importProducts($request->file('file'));
-
-        return redirect()->route('admin.products.index')->with('success', 'Products imported successfully.');
-    }
-
-    // Export products as CSV
     public function export()
     {
-        $csv = $this->productService->exportProducts();
+        // Ambil semua produk beserta relasi kategori, supplier, dan atribut
+        $products = Product::with(['category', 'supplier', 'attributes'])->get();
 
-        $filename = 'products_export_' . date('Ymd_His') . '.csv';
+        // Header CSV/tab-delimited
+        $headers = [
+            'Content-Type' => 'application/vnd.ms-excel',
+            'Content-Disposition' => 'attachment; filename="products_export_' . date('Ymd_His') . '.xls"',
+        ];
 
-        return response($csv)
-            ->header('Content-Type', 'text/csv')
-            ->header('Content-Disposition', "attachment; filename=\"$filename\"");
+        // Judul kolom
+        $csv = "Name\tPrice\tCategory\tSupplier\tAttributes\tSKU\tStock\tMinimum Stock\n";
+
+        foreach ($products as $product) {
+            $attributes = $product->attributes->map(function ($attr) {
+                return $attr->name . ':' . $attr->value;
+            })->implode(', ');
+
+            $csv .=
+                $product->name . "\t" .
+                $product->price . "\t" .
+                ($product->category->name ?? 'N/A') . "\t" .
+                ($product->supplier->name ?? 'N/A') . "\t" .
+                $attributes . "\t" .
+                $product->sku . "\t" .
+                $product->stock . "\t" .
+                $product->minimum_stock . "\n";
+        }
+
+        return response($csv, 200, $headers);
     }
+
+
 }

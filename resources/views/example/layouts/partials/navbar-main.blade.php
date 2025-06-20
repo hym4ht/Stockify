@@ -2,7 +2,6 @@
   <div class="container py-3 mx-auto">
     <div class="flex items-center justify-between">
       <div class="flex items-center justify-start">
-        <a href="{{ url('#') }}" class="flex mr-4">
           <img src="{{ asset('static/images/logo.svg')}}" class="h-8 mr-3" alt="Flowbite Logo" />
           <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Stockify</span>
         </a>

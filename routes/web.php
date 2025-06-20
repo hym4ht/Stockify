@@ -67,10 +67,8 @@ Route::get('/manager/dashboard', [DashboardController::class, 'index'])->name('m
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::resource('products', ProductController::class);
-    Route::get('products/import', [ProductController::class, 'importForm'])->name('products.import.form');
-    Route::post('products/import', [ProductController::class, 'import'])->name('products.import');
     Route::get('products/export', [ProductController::class, 'export'])->name('products.export');
+    Route::resource('products', ProductController::class);
     Route::resource('categories', CategoryController::class);
     Route::resource('suppliers', SupplierController::class);
     Route::resource('transaksi', TransaksiController::class);
@@ -107,20 +105,18 @@ Route::middleware(['auth', 'role:Manajer Gudang'])->prefix('manager')->name('man
 });
 
 Route::middleware(['auth'])->group(function () {
-    // Stock opname routes accessible to all authenticated users
     Route::get('/stock/opname', [TransaksiController::class, 'opnameIndex'])->name('stock.opname.index');
     Route::get('/stock/opname/masuk', [TransaksiController::class, 'opnameMasuk'])->name('stock.opname.masuk');
-    // Route::get('/stock/opname/masuk/create', [TransaksiController::class, 'createOpnameMasuk'])->name('stock.opname.masuk.create');
-    // Route::post('/stock/opname/masuk', [TransaksiController::class, 'storeOpnameMasuk'])->name('stock.opname.masuk.store');
     Route::get('/stock/opname/keluar', [TransaksiController::class, 'opnameKeluar'])->name('stock.opname.keluar');
-    // Route::get('/stock/opname/keluar/create', [TransaksiController::class, 'createOpnameKeluar'])->name('stock.opname.keluar.create');
-    // Route::post('/stock/opname/keluar', [TransaksiController::class, 'storeOpnameKeluar'])->name('stock.opname.keluar.store');
     Route::post('/stock/opname/confirm/{id}', [TransaksiController::class, 'confirmOpname'])->name('stock.opname.confirm');
     Route::post('/stock/opname/bulk-confirm', [TransaksiController::class, 'bulkConfirmOpname'])->name('stock.opname.bulkConfirm');
     Route::get('/stock/opname/bulk-confirm', function () {
         return redirect()->route('stock.opname.index');
     });
     Route::get('/stock', [TransaksiController::class, 'index'])->name('stock.index');
+
+    // Profile route for authenticated users
+    Route::get('/profile', [UserController::class, 'profile'])->name('profile');
 
     // Staff settings routes remain under 'staf' prefix and middleware
     Route::middleware(['role:Staff Gudang'])->prefix('staf')->name('staf.')->group(function () {

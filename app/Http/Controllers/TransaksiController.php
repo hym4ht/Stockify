@@ -13,7 +13,7 @@ class TransaksiController extends Controller
     // Display stock transactions
     public function index(Request $request)
     {
-        $query = StockTransaction::with(['product.category', 'product.productAttributes', 'user']);
+$query = StockTransaction::with(['product.category', 'product.attributes', 'user']);
 
         // Filter by period (start_date and end_date)
         if ($request->filled('start_date')) {
@@ -32,7 +32,7 @@ class TransaksiController extends Controller
 
         // Filter by product attribute name and value
         if ($request->filled('attribute_name') && $request->filled('attribute_value')) {
-            $query->whereHas('product.productAttributes', function ($q) use ($request) {
+            $query->whereHas('product.attributes', function ($q) use ($request) {
                 $q->where('name', $request->attribute_name)
                   ->where('value', $request->attribute_value);
             });

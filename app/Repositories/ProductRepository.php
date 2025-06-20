@@ -8,7 +8,7 @@ class ProductRepository
 {
     public function getAllPaginated(int $perPage = 15)
     {
-        return Product::with(['category', 'supplier'])->paginate($perPage);
+        return Product::with(['category', 'supplier', 'attributes'])->paginate($perPage);
     }
 
     public function getAll()
@@ -26,7 +26,7 @@ class ProductRepository
 
     public function search(string $query, int $perPage = 15)
     {
-        return Product::with(['category', 'supplier'])
+        return Product::with(['category', 'supplier', 'attributes'])
             ->where('name', 'like', '%' . $query . '%')
             ->orWhere('sku', 'like', '%' . $query . '%')
             ->orWhere('description', 'like', '%' . $query . '%')

@@ -2,29 +2,33 @@
 
 @section('content')
     <div class="p-6">
-        <h1 class="text-2xl font-semibold mb-4">Info Stock</h1>
+        <h1 class="text-2xl font-semibold mb-6">Info Stok</h1>
+
         @if(session('success'))
-            <div class="mb-4 p-4 bg-green-200 text-green-800 rounded">
+            <div class="mb-4 p-4 bg-green-100 text-green-800 border border-green-300 rounded-lg">
                 {{ session('success') }}
             </div>
         @endif
-        <table class="min-w-full bg-white border border-gray-200">
-            <thead>
-                <tr>
-                    <th class="py-2 px-4 border-b">Nama Produk</th>
-                    <th class="py-2 px-4 border-b">Stok</th>
-                    <th class="py-2 px-4 border-b">Stock Minimum</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($products as $product)
+
+        <div class="overflow-x-auto rounded-lg shadow">
+            <table class="min-w-full bg-white border border-gray-200 divide-y divide-gray-200 text-sm text-left">
+                <thead class="bg-gray-50 text-gray-700 uppercase tracking-wider">
                     <tr>
-                        <td class="py-2 px-4 border-b">{{ $product->name }}</td>
-                        <td class="py-2 px-4 border-b">{{ $product->stock }}</td>
-                        <td class="py-2 px-4 border-b">{{ $product->minimum_stock }}</td>
+                        <th class="px-6 py-3">Nama Produk</th>
+                        <th class="px-6 py-3">Stok</th>
+                        <th class="px-6 py-3 text-center">Stock Minimum</th>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    @foreach($products as $product)
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">{{ $product->name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ $product->stock }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">{{ $product->minimum_stock }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
 @endsection
