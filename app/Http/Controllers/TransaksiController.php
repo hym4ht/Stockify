@@ -11,12 +11,34 @@ use Illuminate\Support\Facades\Log;
 class TransaksiController extends Controller
 {
     // Display stock transactions
-    public function index()
+    public function index(Request $request)
     {
-        $transactions = StockTransaction::with(['product', 'user'])->orderBy('created_at', 'desc')->paginate(20);
+        $query = StockTransaction::with(['product.category', 'product.productAttributes', 'user']);
 
-        // Calculate total stock from products table
+        // Filter by period (start_date and end_date)
+        if ($request->filled('start_date')) {
+            $query->whereDate('created_at', '>=', $request->start_date);
+        }
+        if ($request->filled('end_date')) {
+            $query->whereDate('created_at', '<=', $request->end_date);
+        }
 
+        // Filter by category
+        if ($request->filled('category_id')) {
+            $query->whereHas('product.category', function ($q) use ($request) {
+                $q->where('id', $request->category_id);
+            });
+        }
+
+        // Filter by product attribute name and value
+        if ($request->filled('attribute_name') && $request->filled('attribute_value')) {
+            $query->whereHas('product.productAttributes', function ($q) use ($request) {
+                $q->where('name', $request->attribute_name)
+                  ->where('value', $request->attribute_value);
+            });
+        }
+
+        $transactions = $query->orderBy('created_at', 'desc')->paginate(20)->appends($request->all());
 
         // Calculate total damaged/lost goods from confirmed opname transactions
         $damagedLostSum = StockTransaction::confirmed()
@@ -26,7 +48,17 @@ class TransaksiController extends Controller
         // mengambil semua data stock
         $totalStock = Product::sum('stock');
 
-        return view('admin.transaksi.index', compact('totalStock', 'damagedLostSum', 'transactions'));
+        // Fetch categories for filter dropdown
+        $categories = \App\Models\Category::all();
+
+        // Fetch distinct attribute names and values for filter dropdowns
+        $attributeNames = \App\Models\ProductAttribute::select('name')->distinct()->pluck('name');
+        $attributeValues = [];
+        if ($request->filled('attribute_name')) {
+            $attributeValues = \App\Models\ProductAttribute::where('name', $request->attribute_name)->distinct()->pluck('value');
+        }
+
+        return view('admin.transaksi.index', compact('totalStock', 'damagedLostSum', 'transactions', 'categories', 'attributeNames', 'attributeValues'));
     }
 
     // Show form to add stock transaction (in or out)
@@ -175,7 +207,17 @@ class TransaksiController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('staf.opname.index', compact('opnameRecords'));
+        $opnameMasukRecords = StockTransaction::where('type', 'in')
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $opnameKeluarRecords = StockTransaction::where('type', 'out')
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('staf.opname.index', compact('opnameRecords', 'opnameMasukRecords', 'opnameKeluarRecords'));
     }
 
     // Show opname masuk records
@@ -316,8 +358,8 @@ class TransaksiController extends Controller
             }
 
             // Update nilai fisik dan kerusakan
-            $opname->physical_count = isset($physicalCounts[$id]) ? (int)$physicalCounts[$id] : null;
-            $opname->damaged_lost_goods = isset($damagedLostGoods[$id]) ? (int)$damagedLostGoods[$id] : null;
+            $opname->physical_count = isset($physicalCounts[$id]) ? (int) $physicalCounts[$id] : null;
+            $opname->damaged_lost_goods = isset($damagedLostGoods[$id]) ? (int) $damagedLostGoods[$id] : null;
 
             // Update status
             $opname->status = 'confirmed';

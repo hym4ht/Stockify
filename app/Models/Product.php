@@ -20,6 +20,7 @@ class Product extends Model
         'description',
         'price',
         'stock',
+        'minimum_stock',
     ];
 
     public function category()
@@ -35,5 +36,27 @@ class Product extends Model
     public function stockTransactions()
     {
         return $this->hasMany(StockTransaction::class);
+    }
+
+    public function productAttributes()
+    {
+        return $this->hasMany(ProductAttribute::class);
+    }
+
+    // Get sum of confirmed physical stock transactions (type 'in')
+    public function getPhysicalStockAttribute()
+    {
+        return $this->stockTransactions()
+            ->confirmed()
+            ->where('type', 'in')
+            ->sum('physical_count');
+    }
+
+    // Get sum of confirmed lost or damaged goods
+    public function getLostDamagedStockAttribute()
+    {
+        return $this->stockTransactions()
+            ->confirmed()
+            ->sum('damaged_lost_goods');
     }
 }

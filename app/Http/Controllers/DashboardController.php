@@ -118,7 +118,8 @@ class DashboardController extends Controller
             ));
         } elseif (str_contains($user->role, 'Manajer')) {
             // Data khusus untuk dashboard manager
-            $productCount = Product::where('stock', '<', 10)->count();
+            $lowStockProducts = Product::whereColumn('stock', '<', 'minimum_stock')->get();
+            $productCount = $lowStockProducts->count();
 
             $todayStart = Carbon::today();
             $todayEnd = Carbon::today()->endOfDay();
@@ -131,30 +132,63 @@ class DashboardController extends Controller
                 ->whereBetween('created_at', [$todayStart, $todayEnd])
                 ->count();
 
-            // Data untuk grafik (hari ini saja)
-            $dates = collect();
-            $stockInData = collect();
+            // Fetch pending opname masuk and keluar counts for notifications
+            $pendingOpnameMasukCount = StockTransaction::where('type', 'in')
+                ->where('status', 'pending')
+                ->count();
 
-            $end = Carbon::now();
-            $start = Carbon::now()->subDay();
+            $pendingOpnameKeluarCount = StockTransaction::where('type', 'out')
+                ->where('status', 'pending')
+                ->count();
 
-            $dates->push($start->format('d M H:i') . ' - ' . $end->format('d M H:i'));
+            // Data untuk grafik berdasarkan produk hari ini
+            $start = Carbon::today();
+            $end = Carbon::today()->endOfDay();
 
-            $stockInData->push(
-                StockTransaction::where('type', 'in')
-                    ->whereBetween('created_at', [$start, $end])
-                    ->count()
-            );
+            $stockInDataRaw = StockTransaction::where('type', 'in')
+                ->whereBetween('created_at', [$start, $end])
+                ->selectRaw('product_id, SUM(physical_count) as total_physical_count')
+                ->groupBy('product_id')
+                ->with('product')
+                ->get();
+
+            $stockOutDataRaw = StockTransaction::where('type', 'out')
+                ->whereBetween('created_at', [$start, $end])
+                ->selectRaw('product_id, COUNT(*) as total_count')
+                ->groupBy('product_id')
+                ->with('product')
+                ->get();
+
+            $productNames = [];
+            $stockInData = [];
+            $stockOutData = [];
+
+            // Collect product names from both datasets
+            $productIds = $stockInDataRaw->pluck('product_id')->merge($stockOutDataRaw->pluck('product_id'))->unique();
+
+            foreach ($productIds as $productId) {
+                $product = $stockInDataRaw->firstWhere('product_id', $productId)->product ?? $stockOutDataRaw->firstWhere('product_id', $productId)->product;
+                $productNames[] = $product->name ?? 'Unknown';
+
+                $inCount = $stockInDataRaw->firstWhere('product_id', $productId)->total_physical_count ?? 0;
+                $outCount = $stockOutDataRaw->firstWhere('product_id', $productId)->total_count ?? 0;
+
+                $stockInData[] = $inCount;
+                $stockOutData[] = -$outCount; // negative for stock out
+            }
 
             return view('manager.dashboard', [
                 'productCount' => $productCount,
+                'lowStockProducts' => $lowStockProducts,
                 'transactionsInCount' => $transactionsInCount,
                 'transactionsOutCount' => $transactionsOutCount,
+                'pendingOpnameMasukCount' => $pendingOpnameMasukCount,
+                'pendingOpnameKeluarCount' => $pendingOpnameKeluarCount,
                 'startDate' => $todayStart->format('d M Y'),
                 'endDate' => $todayEnd->format('d M Y'),
-                'dates' => $dates->toArray(),
-                'stockInData' => $stockInData->toArray(),
-                'stockOutData' => [], // empty array since not used
+                'dates' => $productNames,
+                'stockInData' => $stockInData,
+                'stockOutData' => $stockOutData,
             ]);
         } elseif ($user->role === 'Staff Gudang') {
             // Staf Gudang dashboard data with pending tasks

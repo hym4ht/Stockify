@@ -23,5 +23,9 @@
         <x-sidebar-menu-dropdown-item-dashboard routeName="admin.reports.user_activity"
             title="Laporan Aktivitas Pengguna" />
     </x-sidebar-menu-dropdown-dashboard>
+    <x-sidebar-menu-dropdown-dashboard routeName="admin.stock.*" title="Stock">
+        <x-sidebar-menu-dropdown-item-dashboard routeName="admin.stock.info" title="Info Stock" />
+        <x-sidebar-menu-dropdown-item-dashboard routeName="admin.stock.settings" title="Pengaturan Stock Minimum" />
+    </x-sidebar-menu-dropdown-dashboard>
 </x-sidebar-dashboard>
 -

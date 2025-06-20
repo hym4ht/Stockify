@@ -213,13 +213,16 @@
                             y: {
                                 beginAtZero: true,
                                 ticks: {
-                                    stepSize: 1
+                                    stepSize: 1,
+                                    font: {
+                                        size: 7
+                                    }
                                 }
                             },
                             x: {
                                 ticks: {
                                     font: {
-                                        size: 8 // <= Ukuran font label tanggal di sumbu X
+                                        size: 8
                                     }
                                 }
                             }

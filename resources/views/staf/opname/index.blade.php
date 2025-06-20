@@ -1,101 +1,70 @@
 @extends('layouts.dashboard')
 
 @section('content')
-<div class="p-4">
-    @if(session('success'))
-        <div class="mb-4 p-4 bg-green-100 text-green-800 rounded">
-            {{ session('success') }}
-        </div>
-    @endif
-    @if(session('error'))
-        <div class="mb-4 p-4 bg-red-100 text-red-800 rounded">
-            {{ session('error') }}
-        </div>
-    @endif
-    <h1 class="text-2xl font-bold mb-4">Opname Gudang</h1>
-    <p>Proses opname gudang biasanya melibatkan:</p>
-    <ul class="list-disc list-inside mb-4">
-        <li>Pengecekan fisik barang satu per satu</li>
-        <li>Pencocokan data antara stok nyata dan laporan inventaris</li>
-        <li>Identifikasi selisih jika ada kekurangan atau kelebihan stok</li>
-        <li>Penyesuaian data dalam sistem agar lebih akurat</li>
-    </ul>
+<div class="p-4 space-y-4">
 
-    @if($opnameRecords->isEmpty())
-    <p>Tidak ada opname gudang yang perlu dikonfirmasi.</p>
-    @else
-    <form method="POST" action="{{ route('stock.opname.bulkConfirm') }}">
-        @csrf
-        <table class="min-w-full border border-gray-300">
-            <thead>
-                <tr>
-                    @if(auth()->user()->role !== 'Staff Gudang')
-                    <th class="border border-gray-300 px-4 py-2">Pilih</th>
-                    @endif
-                    <th class="border border-gray-300 px-4 py-2">Tanggal</th>
-                    <th class="border border-gray-300 px-4 py-2">Produk</th>
-                    <th class="border border-gray-300 px-4 py-2">Jumlah Sistem</th>
-                    <th class="border border-gray-300 px-4 py-2">Jumlah Fisik</th>
-                    <th class="border border-gray-300 px-4 py-2">Barang Hilang/Rusak</th>
-                    <th class="border border-gray-300 px-4 py-2">Selisih</th>
-                    @if(auth()->user()->role !== 'Staff Gudang')
-                    <th class="border border-gray-300 px-4 py-2">Konfirmasi</th>
-                    @endif
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($opnameRecords as $opname)
-                <tr>
-                    @if(auth()->user()->role !== 'Staff Gudang')
-                    <td class="border border-gray-300 px-4 py-2">
-                        <input type="checkbox" name="confirm[]" value="{{ $opname->id }}" class="form-checkbox" />
-                    </td>
-                    @endif
-                    <td class="border border-gray-300 px-4 py-2">{{ $opname->created_at->format('Y-m-d H:i') }}</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ $opname->product->name ?? 'N/A' }}</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ $opname->quantity }}</td>
-                    <td class="border border-gray-300 px-4 py-2">
-                        @if(auth()->user()->role !== 'Staff Gudang')
-                        <input type="number" name="physical_count[{{ $opname->id }}]" value="{{ old('physical_count.' . $opname->id, $opname->physical_count) }}" class="w-full border border-gray-300 rounded px-2 py-1" />
-                        @else
-                        {{ $opname->physical_count ?? '-' }}
-                        @endif
-                    </td>
-                    <td class="border border-gray-300 px-4 py-2">
-                        @if(auth()->user()->role !== 'Staff Gudang')
-                        <input type="number" name="damaged_lost_goods[{{ $opname->id }}]" value="{{ old('damaged_lost_goods.' . $opname->id, $opname->damaged_lost_goods) }}" class="w-full border border-gray-300 rounded px-2 py-1" />
-                        @else
-                        {{ $opname->damaged_lost_goods ?? '-' }}
-                        @endif
-                    <td class="border border-gray-300 px-4 py-2">
-                        @php
-                        $discrepancy = $opname->physical_count !== null ? $opname->physical_count - $opname->quantity - ($opname->damaged_lost_goods ?? 0)  : '-';
-                        @endphp
-                        {{ $discrepancy }}
-                    </td>
-                    <td class="border border-gray-300 px-4 py-2">
-                        @if(auth()->user()->role !== 'Staff Gudang')
-                        <input type="text" name="adjustment_note[{{ $opname->id }}]" value="{{ old('adjustment_note.' . $opname->id, $opname->adjustment_note) }}" class="w-full border border-gray-300 rounded px-2 py-1" />
-                        @else
-                        {{ $opname->adjustment_note ?? '-' }}
-                        @endif
-                    </td>
-                    @if(auth()->user()->role !== 'Staff Gudang')
-                    <td class="border border-gray-300 px-4 py-2 text-center">
-                        <button type="button" onclick="event.preventDefault(); document.getElementById('confirm-form-{{ $opname->id }}').submit();" class="px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700">Konfirmasi</button>
-                        <form id="confirm-form-{{ $opname->id }}" action="{{ route('stock.opname.confirm', $opname->id) }}" method="POST" style="display: none;">
-                            @csrf
-                        </form>
-                    </td>
-                    @endif
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-        @if(auth()->user()->role !== 'Staff Gudang')
-        <button type="submit" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Konfirmasi Terpilih</button>
-        @endif
-    </form>
+    {{-- Notifikasi Success --}}
+    @if(session('success'))
+    <div class="flex items-center p-4 rounded-lg bg-green-100 text-green-800 shadow-md animate-fade-in-down">
+        <svg class="w-6 h-6 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M5 13l4 4L19 7" />
+        </svg>
+        <span>{{ session('success') }}</span>
+    </div>
+    @endif
+
+    {{-- Notifikasi Error --}}
+    @if(session('error'))
+    <div class="flex items-center p-4 rounded-lg bg-red-100 text-red-800 shadow-md animate-fade-in-down">
+        <svg class="w-6 h-6 mr-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        <span>{{ session('error') }}</span>
+    </div>
+    @endif
+
+    {{-- Notifikasi Opname Masuk --}}
+    @if(!$opnameMasukRecords->isEmpty())
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded shadow-md animate-fade-in-down">
+        <div class="flex items-center mb-2">
+            <svg class="w-5 h-5 mr-2 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M12 20.5c4.694 0 8.5-3.806 8.5-8.5S16.694 3.5 12 3.5 3.5 7.306 3.5 12 7.306 20.5 12 20.5z" />
+            </svg>
+            <h2 class="font-semibold">Opname Masuk yang perlu dicek</h2>
+        </div>
+        <ul class="list-disc list-inside space-y-1">
+            @foreach ($opnameMasukRecords as $opname)
+            <li>
+                {{ $opname->created_at->format('Y-m-d H:i') }} - Produk: {{ $opname->product->name ?? 'N/A' }} - Jumlah: {{ $opname->quantity }}
+                <a href="{{ route('stock.opname.masuk') }}" class="text-blue-600 hover:underline ml-2">Lihat detail</a>
+            </li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
+
+    {{-- Notifikasi Opname Keluar --}}
+    @if(!$opnameKeluarRecords->isEmpty())
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded shadow-md animate-fade-in-down">
+        <div class="flex items-center mb-2">
+            <svg class="w-5 h-5 mr-2 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M12 20.5c4.694 0 8.5-3.806 8.5-8.5S16.694 3.5 12 3.5 3.5 7.306 3.5 12 7.306 20.5 12 20.5z" />
+            </svg>
+            <h2 class="font-semibold">Opname Keluar yang perlu dicek</h2>
+        </div>
+        <ul class="list-disc list-inside space-y-1">
+            @foreach ($opnameKeluarRecords as $opname)
+            <li>
+                {{ $opname->created_at->format('Y-m-d H:i') }} - Produk: {{ $opname->product->name ?? 'N/A' }} - Jumlah: {{ $opname->quantity }}
+                <a href="{{ route('stock.opname.keluar') }}" class="text-blue-600 hover:underline ml-2">Lihat detail</a>
+            </li>
+            @endforeach
+        </ul>
+    </div>
     @endif
 </div>
 @endsection

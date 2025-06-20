@@ -10,6 +10,7 @@ use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\StockController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductAttributeController;
 use App\Http\Controllers\ChatController;
@@ -83,12 +84,26 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
     Route::get('reports/user-activity', [ReportController::class, 'userActivityReport'])->name('reports.user_activity');
     Route::get('settings', [SettingController::class, 'adminSettings'])->name('settings.index');
     Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
+
+    // Stock routes
+    Route::get('stock/info', [StockController::class, 'info'])->name('stock.info');
+    Route::get('stock/settings', [StockController::class, 'settings'])->name('stock.settings');
+    Route::put('stock/settings', [StockController::class, 'updateSettings'])->name('stock.settings.update');
 });
 Route::middleware(['auth', 'role:Manajer Gudang'])->prefix('manager')->name('manager.')->group(function () {
     // Contoh rute untuk manager
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('settings', [SettingController::class, 'managerSettings'])->name('settings.index');
     Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
+
+    // Product routes for manager
+    Route::get('products', [App\Http\Controllers\ManagerProductController::class, 'index'])->name('products.index');
+    Route::get('products/{product}', [App\Http\Controllers\ManagerProductController::class, 'show'])->name('products.show');
+
+    // Stok routes for manager gudang
+    Route::get('stok/transaksi/masuk', [App\Http\Controllers\TransaksiController::class, 'opnameMasuk'])->name('stok.transaksi.masuk');
+    Route::get('stok/transaksi/keluar', [App\Http\Controllers\TransaksiController::class, 'opnameKeluar'])->name('stok.transaksi.keluar');
+    Route::get('stok/opname', [App\Http\Controllers\TransaksiController::class, 'opnameIndex'])->name('stok.opname.index');
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -111,6 +126,7 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:Staff Gudang'])->prefix('staf')->name('staf.')->group(function () {
         Route::get('settings', [SettingController::class, 'staffSettings'])->name('settings.index');
         Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
+
     });
 });
 
