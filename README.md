@@ -21,6 +21,23 @@
 
 ---
 
+Contributors:
+
+- 👤 [@hym4ht](https://github.com/hym4ht)
+- 👤 [@keigooooooo](https://github.com/keigooooooo)
+- 👤 [@Nabilabungakartika](https://github.com/Nabilabungakartika)
+
+---
+
+💡 **Ingin bergabung dan berkontribusi?**
+Kami sangat terbuka terhadap kontribusi baru! Kamu bisa:
+- 📌 Cek [issues terbuka](https://github.com/yourusername/yourrepo/issues)
+- 🔀 Ajukan Pull Request
+- 💬 Diskusi di kolom komentar
+
+Bersama, kita bisa membuat proyek ini semakin keren! 🚀
+
+
 ## 🚀 About Laravel
 
 Laravel adalah framework PHP modern yang dirancang untuk membuat pengembangan web menjadi cepat, elegan, dan menyenangkan. Cocok untuk membangun aplikasi kecil hingga besar dengan berbagai fitur canggih.
