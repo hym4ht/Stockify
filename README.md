@@ -34,16 +34,16 @@ Pastikan kamu sudah menginstal:
 - PHP ≥ 8.3
 - Composer
 - Node.js dan npm
-- MySQL / PostgreSQL / SQLite
+- MySQL / MariaDB
 
 Langkah instalasi:
 
 ```bash
 # 1. Clone repository ini
-git clone https://github.com/username/nama-project.git
+git clone https://github.com/hym4ht/stockify
 
 # 2. Masuk ke direktori proyek
-cd nama-project
+cd stockify
 
 # 3. Install dependency PHP
 composer install
