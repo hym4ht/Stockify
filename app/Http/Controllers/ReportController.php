@@ -21,7 +21,7 @@ class ReportController extends Controller
         }
 
         // Filter by product attribute name and value
-if ($request->filled('attribute_name') && $request->filled('attribute_value')) {
+        if ($request->filled('attribute_name') && $request->filled('attribute_value')) {
             $query->whereHas('attributes', function ($q) use ($request) {
                 $q->where('name', $request->attribute_name)
                   ->where('value', $request->attribute_value);
@@ -62,16 +62,15 @@ if ($request->filled('attribute_name') && $request->filled('attribute_value')) {
         return view('admin.reports.stock', compact('products', 'stockSums', 'categories', 'attributeNames', 'attributeValues'));
     }
 
-    // Transaction report for stock in/out per period
+    // Transaction report for stock in/out per single date
     public function transactionReport(Request $request)
     {
-        $query = StockTransaction::with(['product', 'user']);
+        $query = StockTransaction::with(['product', 'confirmedBy']);
 
-        if ($request->filled('start_date')) {
-            $query->whereDate('created_at', '>=', $request->start_date);
-        }
-        if ($request->filled('end_date')) {
-            $query->whereDate('created_at', '<=', $request->end_date);
+        if ($request->filled('date')) {
+            $query->whereDate('confirmed_at', $request->date);
+        } else {
+            $query->whereDate('confirmed_at', date('Y-m-d'));
         }
 
         $transactions = $query->get();

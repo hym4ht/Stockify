@@ -207,7 +207,18 @@ class DashboardController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->get();
 
-            return view('staf.dashboard', compact('pendingIncoming', 'pendingOutgoing', 'pendingOpname'));
+            // New variables for opnameMasukRecords and opnameKeluarRecords for the integrated view
+            $opnameMasukRecords = StockTransaction::where('type', 'in')
+                ->where('status', 'pending')
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            $opnameKeluarRecords = StockTransaction::where('type', 'out')
+                ->where('status', 'pending')
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            return view('staf.dashboard', compact('pendingIncoming', 'pendingOutgoing', 'pendingOpname', 'opnameMasukRecords', 'opnameKeluarRecords'));
         } else {
             // Default dashboard or redirect
             return redirect()->route('dashboard');

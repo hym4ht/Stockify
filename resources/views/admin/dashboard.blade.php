@@ -92,7 +92,8 @@
                         <h2 class="text-lg font-medium text-gray-700 dark:text-gray-300">Stock Info</h2>
                     </div>
                     <div class="p-4 flex-grow flex flex-col justify-center">
-                        <canvas id="stockInfoPieChart" class="w-full h-[30rem] min-h-[30rem]"></canvas>
+                        <canvas id="stockInfoPieChart"
+                            class="w-full h-[20rem] min-h-[20rem] sm:h-[25rem] sm:min-h-[25rem] md:h-[30rem] md:min-h-[30rem]"></canvas>
                     </div>
                 </div>
             </div>
@@ -247,7 +248,7 @@
                 const pieChart = new Chart(pieCtx, {
                     type: 'pie',
                     data: {
-                        labels: ['Physical Count', 'Damaged/Lost Goods'],
+                        labels: ['Physical Count', 'Damaged/Lost'],
                         datasets: [{
                             data: [totalPhysicalCount, totalDamagedLostGoods],
                             backgroundColor: ['#0FFF50', '#FF5733'],
@@ -259,20 +260,32 @@
                         plugins: {
                             legend: {
                                 position: 'bottom',
+                                align: 'center', 
                                 labels: {
+                                    usePointStyle: true,
+                                    pointStyle: 'rect', 
+                                    boxWidth: 12,
+                                    boxHeight: 12,
+                                    padding: 16,
+                                    color: '#4B5563', 
                                     font: {
                                         size: 14
                                     }
                                 }
                             },
                             tooltip: {
-                                enabled: true
+                                enabled: true,
+                                callbacks: {
+                                    label: function (context) {
+                                        const label = context.label || '';
+                                        const value = context.raw || 0;
+                                        return `${label}: ${value.toLocaleString()}`;
+                                    }
+                                }
                             }
                         }
                     }
                 });
-
-                // Force resize after a short delay to fix initial alignment issues
                 setTimeout(() => {
                     stockChart.resize();
                     pieChart.resize();

@@ -358,8 +358,14 @@ $query = StockTransaction::with(['product.category', 'product.attributes', 'user
             }
 
             // Update nilai fisik dan kerusakan
-            $opname->physical_count = isset($physicalCounts[$id]) ? (int) $physicalCounts[$id] : null;
-            $opname->damaged_lost_goods = isset($damagedLostGoods[$id]) ? (int) $damagedLostGoods[$id] : null;
+            $opname->physical_count = isset($physicalCounts[$id]) ? (int) $physicalCounts[$id] : 0;
+            $opname->damaged_lost_goods = isset($damagedLostGoods[$id]) ? (int) $damagedLostGoods[$id] : 0;
+
+            // Validation: physical_count + damaged_lost_goods <= quantity
+            $totalCount = $opname->physical_count + $opname->damaged_lost_goods;
+            if ($totalCount > $opname->quantity) {
+                return redirect()->back()->with('error', "Jumlah fisik dan barang hilang/rusak untuk produk '{$opname->product->name}' melebihi quantity opname ({$opname->quantity}).");
+            }
 
             // Update status
             $opname->status = 'confirmed';
