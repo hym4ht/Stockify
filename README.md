@@ -31,7 +31,7 @@ Laravel adalah framework PHP modern yang dirancang untuk membuat pengembangan we
 
 Pastikan kamu sudah menginstal:
 
-- PHP ≥ 8.1
+- PHP ≥ 8.3
 - Composer
 - Node.js dan npm
 - MySQL / PostgreSQL / SQLite
