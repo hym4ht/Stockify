@@ -14,6 +14,13 @@ class SupplierController extends Controller
         return view('admin.suppliers.index', compact('suppliers'));
     }
 
+    // Display a listing of suppliers for manager (read-only)
+    public function managerIndex()
+    {
+        $suppliers = Supplier::with('products')->paginate(15);
+        return view('manager.suppliers.index', compact('suppliers'));
+    }
+
     // Show the form for creating a new supplier
     public function create()
     {

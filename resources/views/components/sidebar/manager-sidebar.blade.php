@@ -10,6 +10,9 @@
     <x-sidebar-menu-dropdown-dashboard routeName="manager.products.*" title="Produk">
         <x-sidebar-menu-dropdown-item-dashboard routeName="manager.products.index" title="Melihat daftar produk" />
     </x-sidebar-menu-dropdown-dashboard>
+    <x-sidebar-menu-dropdown-dashboard routeName="manager.suppliers.*" title="Supplier">
+        <x-sidebar-menu-dropdown-item-dashboard routeName="manager.suppliers.index" title="Daftar Supplier" />
+    </x-sidebar-menu-dropdown-dashboard>
     <x-sidebar-menu-dropdown-dashboard routeName="manager.reports.*" title="Laporan">
         <x-sidebar-menu-dropdown-item-dashboard routeName="manager.reports.index" title="Laporan Manager" />
     </x-sidebar-menu-dropdown-dashboard>

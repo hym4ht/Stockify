@@ -102,6 +102,9 @@ Route::middleware(['auth', 'role:Manajer Gudang'])->prefix('manager')->name('man
     Route::get('stok/transaksi/masuk', [App\Http\Controllers\TransaksiController::class, 'opnameMasuk'])->name('stok.transaksi.masuk');
     Route::get('stok/transaksi/keluar', [App\Http\Controllers\TransaksiController::class, 'opnameKeluar'])->name('stok.transaksi.keluar');
     Route::get('stok/opname', [App\Http\Controllers\TransaksiController::class, 'opnameIndex'])->name('stok.opname.index');
+
+    // Supplier list route for manager (read-only)
+    Route::get('suppliers', [App\Http\Controllers\SupplierController::class, 'managerIndex'])->name('suppliers.index');
 });
 
 Route::middleware(['auth'])->group(function () {

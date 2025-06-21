@@ -2,6 +2,8 @@
 <html lang="en" class="dark">
 
 <head>
+    <!-- Swiper CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="#">
@@ -56,6 +58,7 @@
 @php
     $whiteBg = isset($params['white_bg']) && $params['white_bg'];
 @endphp
+<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
 
 <body
     class="{{ $whiteBg ? 'bg-white dark:bg-gray-900 text-black dark:text-white' : 'bg-gray-50 dark:bg-gray-800 text-black dark:text-white' }}">
@@ -82,6 +85,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.2/datepicker.min.js"></script>
+        @stack('scripts')
 </body>
 
 </html>
