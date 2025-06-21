@@ -29,14 +29,6 @@ Contributors:
 
 ---
 
-💡 **Ingin bergabung dan berkontribusi?**
-Kami sangat terbuka terhadap kontribusi baru! Kamu bisa:
-- 📌 Cek [issues terbuka](https://github.com/yourusername/yourrepo/issues)
-- 🔀 Ajukan Pull Request
-- 💬 Diskusi di kolom komentar
-
-Bersama, kita bisa membuat proyek ini semakin keren! 🚀
-
 
 ## 🚀 About Laravel
 
