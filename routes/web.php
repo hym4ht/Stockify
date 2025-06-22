@@ -90,7 +90,8 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
 });
 Route::middleware(['auth', 'role:Manajer Gudang'])->prefix('manager')->name('manager.')->group(function () {
     // Contoh rute untuk manager
-    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports', [ReportController::class, 'managerStockReport'])->name('reports.index');
+    Route::get('reports/stock', [ReportController::class, 'managerStockReport'])->name('reports.stock');
     Route::get('settings', [SettingController::class, 'managerSettings'])->name('settings.index');
     Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
 

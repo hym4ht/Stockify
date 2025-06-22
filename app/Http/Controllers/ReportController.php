@@ -24,7 +24,7 @@ class ReportController extends Controller
         if ($request->filled('attribute_name') && $request->filled('attribute_value')) {
             $query->whereHas('attributes', function ($q) use ($request) {
                 $q->where('name', $request->attribute_name)
-                  ->where('value', $request->attribute_value);
+                    ->where('value', $request->attribute_value);
             });
         }
 
@@ -60,6 +60,54 @@ class ReportController extends Controller
         }
 
         return view('admin.reports.stock', compact('products', 'stockSums', 'categories', 'attributeNames', 'attributeValues'));
+    }
+
+   
+
+    public function managerStockReport(Request $request)
+    {
+        $query = Product::query();
+
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        if ($request->filled('attribute_name') && $request->filled('attribute_value')) {
+            $query->whereHas('attributes', function ($q) use ($request) {
+                $q->where('name', $request->attribute_name)
+                    ->where('value', $request->attribute_value);
+            });
+        }
+
+        $products = $query->with('category')->get();
+
+        $productIds = $products->pluck('id')->toArray();
+
+        $stockTransactionsQuery = StockTransaction::confirmed()
+            ->whereIn('product_id', $productIds);
+
+        if ($request->filled('start_date')) {
+            $stockTransactionsQuery->whereDate('created_at', '>=', $request->start_date);
+        }
+        if ($request->filled('end_date')) {
+            $stockTransactionsQuery->whereDate('created_at', '<=', $request->end_date);
+        }
+
+        $stockSums = $stockTransactionsQuery
+            ->selectRaw('product_id, type, SUM(quantity) as total_quantity')
+            ->groupBy('product_id', 'type')
+            ->get()
+            ->groupBy('product_id');
+
+        $categories = \App\Models\Category::all();
+
+        $attributeNames = \App\Models\ProductAttribute::select('name')->distinct()->pluck('name');
+        $attributeValues = [];
+        if ($request->filled('attribute_name')) {
+            $attributeValues = \App\Models\ProductAttribute::where('name', $request->attribute_name)->distinct()->pluck('value');
+        }
+
+        return view('manager.reports.stock', compact('products', 'stockSums', 'categories', 'attributeNames', 'attributeValues'));
     }
 
     // Transaction report for stock in/out per single date
