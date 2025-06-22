@@ -32,8 +32,8 @@
   <div class="hidden sm:hidden" id="mobile-menu">
     <ul class="pt-2">
       <li>
-        <a href="#"
-          class="block py-2 pl-3 pr-4 text-base font-normal text-gray-900 bg-gray-100 dark:bg-gray-700 dark:text-white">Dashboard</a>
+        <a href="{{ Route('login') }}" 
+          class="block py-2 pl-3 pr-4 text-base font-normal text-gray-900 bg-gray-100 dark:bg-gray-700 dark:text-white">Login</a>
       </li>
       <li>
         <a href="#"

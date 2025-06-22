@@ -10,11 +10,11 @@
             <div class="flex items-center justify-between mb-6">
                 <button id="prevMonth"
                     class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500">
-                    < Prev </button>
-                        <h2 id="monthYear" class="text-2xl font-semibold text-gray-900 dark:text-gray-100"></h2>
+                    < </button>
+                        <h2 id="monthYear" class="text-1.5xl font-semibold text-gray-900 dark:text-gray-100"></h2>
                         <button id="nextMonth"
                             class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500">
-                            Next >
+                             >
                         </button>
             </div>
 

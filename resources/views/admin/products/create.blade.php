@@ -6,21 +6,21 @@
     <form action="{{ route('admin.products.store') }}" method="POST" class="max-w-lg">
         @csrf
         <div class="mb-4">
-            <label for="name" class="block text-gray-700 font-bold mb-2">Name</label>
+            <label for="name" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">Name</label>
             <input type="text" name="name" id="name" value="{{ old('name') }}" required
-                class="w-full border border-gray-300 rounded px-3 py-2 @error('name') border-red-500 @enderror" />
+                class="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 @error('name') border-red-500 @enderror" />
             @error('name')
             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
 
         <div class="mb-4">
-            <label for="category_id" class="block text-gray-700 font-bold mb-2">Category</label>
+            <label for="category_id" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">Category</label>
             <select name="category_id" id="category_id" required
-                class="w-full border border-gray-300 rounded px-3 py-2 @error('category_id') border-red-500 @enderror">
-                <option value="">Select Category</option>
+                class="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 @error('category_id') border-red-500 @enderror">
+                <option value="" class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">Select Category</option>
                 @foreach(\App\Models\Category::all() as $category)
-                <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                <option value="{{ $category->id }}" class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" {{ old('category_id') == $category->id ? 'selected' : '' }}>
                     {{ $category->name }}
                 </option>
                 @endforeach
@@ -31,12 +31,12 @@
         </div>
 
         <div class="mb-4">
-            <label for="supplier_id" class="block text-gray-700 font-bold mb-2">Supplier</label>
+            <label for="supplier_id" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">Supplier</label>
             <select name="supplier_id" id="supplier_id" required
-                class="w-full border border-gray-300 rounded px-3 py-2 @error('supplier_id') border-red-500 @enderror">
-                <option value="">Select Supplier</option>
+                class="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 @error('supplier_id') border-red-500 @enderror">
+                <option value="" class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">Select Supplier</option>
                 @foreach(\App\Models\Supplier::all() as $supplier)
-                <option value="{{ $supplier->id }}" {{ old('supplier_id') == $supplier->id ? 'selected' : '' }}>
+                <option value="{{ $supplier->id }}" class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" {{ old('supplier_id') == $supplier->id ? 'selected' : '' }}>
                     {{ $supplier->name }}
                 </option>
                 @endforeach
@@ -47,29 +47,29 @@
         </div>
 
         <div class="mb-4">
-            <label for="sku" class="block text-gray-700 font-bold mb-2">SKU</label>
+            <label for="sku" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">SKU</label>
             <input type="text" name="sku" id="sku" value="{{ old('sku') }}"
-                class="w-full border border-gray-300 rounded px-3 py-2 @error('sku') border-red-500 @enderror" />
+                class="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 @error('sku') border-red-500 @enderror" />
             @error('sku')
             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
 
         <div class="mb-4">
-            <label for="description" class="block text-gray-700 font-bold mb-2">Description</label>
+            <label for="description" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">Description</label>
             <textarea name="description" id="description"
-                class="w-full border border-gray-300 rounded px-3 py-2 @error('description') border-red-500 @enderror">{{ old('description') }}</textarea>
+                class="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 @error('description') border-red-500 @enderror">{{ old('description') }}</textarea>
             @error('description')
             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
 
         <div class="mb-4">
-            <label for="price" class="block text-gray-700 font-bold mb-2">Price</label>
+            <label for="price" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">Price</label>
             <div class="flex">
-                <span class="inline-flex items-center px-3 rounded-l border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">Rp</span>
+                <span class="inline-flex items-center px-3 rounded-l border border-r-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 text-sm">Rp</span>
                 <input type="number" name="price" id="price" value="{{ old('price') }}" step="0.01" min="0" required
-                    class="w-full border border-gray-300 rounded-r px-3 py-2 @error('price') border-red-500 @enderror" />
+                    class="w-full border border-gray-300 dark:border-gray-600 rounded-r px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 @error('price') border-red-500 @enderror" />
             </div>
             @error('price')
             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -80,7 +80,7 @@
         </div>
 
         <button type="submit"
-            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Create Product</button>
+            class="bg-blue-600 dark:bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-700 dark:hover:bg-blue-800">Create Product</button>
     </form>
 </div>
 
