@@ -20,6 +20,7 @@ class Product extends Model
         'description',
         'price',
         'stock',
+        'harga_jual',
         'minimum_stock',
     ];
 

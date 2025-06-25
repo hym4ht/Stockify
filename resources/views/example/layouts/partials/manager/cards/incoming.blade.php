@@ -9,7 +9,7 @@
             </small>
         </span>
     </h2>
-    <p class="text-3xl font-bold text-gray-900 dark:text-white mt-auto">
+    <p class="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
         {{ $transactionsInCount }}
     </p>
 </div>

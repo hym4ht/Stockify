@@ -68,6 +68,8 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
 
 Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('products/export', [ProductController::class, 'export'])->name('products.export');
+    Route::get('products/import', [ProductController::class, 'showImportForm'])->name('products.import.form');
+    Route::post('products/import', [ProductController::class, 'import'])->name('products.import');
     Route::resource('products', ProductController::class);
     Route::resource('categories', CategoryController::class);
     Route::resource('suppliers', SupplierController::class);

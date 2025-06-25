@@ -76,7 +76,16 @@
             @enderror
         </div>
 
-        <div class="mb-6">
+        <div class="mb-4">
+            <label for="harga_jual" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">Harga Jual</label>
+            <div class="flex">
+                <span class="inline-flex items-center px-3 rounded-l border border-r-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 text-sm">Rp</span>
+                <input type="number" name="harga_jual" id="harga_jual" value="{{ old('harga_jual') }}" step="0.01" min="0" required
+                    class="w-full border border-gray-300 dark:border-gray-600 rounded-r px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 @error('harga_jual') border-red-500 @enderror" />
+            </div>
+            @error('harga_jual')
+            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
         </div>
 
         <button type="submit"

@@ -6,6 +6,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Services\ProductService;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
@@ -26,6 +27,26 @@ class ProductController extends Controller
             $products = $this->productService->listProducts();
         }
         return view('admin.products.index', compact('products', 'query'));
+    }
+
+    // Show import form
+    public function showImportForm()
+    {
+        return view('admin.products.import');
+    }
+
+    // Handle import POST
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:csv,txt',
+        ]);
+
+        $file = $request->file('file');
+
+        $this->productService->importProducts($file);
+
+        return redirect()->route('admin.products.index')->with('success', 'Products imported successfully.');
     }
 
     // Show the form for creating a new product
@@ -56,7 +77,7 @@ class ProductController extends Controller
 
             return redirect()->route('admin.products.index')->with('success', 'Product created successfully.');
         } catch (ValidationException $e) {
-            return redirect()->back()->withErrors($e->validator)->withInput();
+            return redirect()->back()->withErrors($e->errors())->withInput();
         }
     }
 
@@ -70,10 +91,22 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         try {
-            $this->productService->updateProduct($product, $request->all());
+            Log::info('Update Product Request Data:', $request->all());
+
+            // Explicitly set harga_jual to product model before update
+            if ($request->has('harga_jual')) {
+                $product->harga_jual = $request->input('harga_jual');
+            }
+
+            // Update other fields via service
+            $this->productService->updateProduct($product, $request->except('harga_jual'));
+
+            // Save the product with updated harga_jual
+            $product->save();
             return redirect()->route('admin.products.index')->with('success', 'Product updated successfully.');
         } catch (ValidationException $e) {
-            return redirect()->back()->withErrors($e->validator)->withInput();
+            Log::error('Validation error on product update', ['errors' => $e->errors()]);
+            return redirect()->back()->withErrors($e->errors())->withInput();
         }
     }
 
@@ -103,7 +136,7 @@ class ProductController extends Controller
         ];
 
         // Judul kolom
-        $csv = "Name\tPrice\tCategory\tSupplier\tAttributes\tSKU\tStock\tMinimum Stock\n";
+        $csv = "Name\tPrice\tHarga Jual\tCategory\tSupplier\tAttributes\tSKU\tStock\tMinimum Stock\n";
 
         foreach ($products as $product) {
             $attributes = $product->attributes->map(function ($attr) {
@@ -113,6 +146,7 @@ class ProductController extends Controller
             $csv .=
                 $product->name . "\t" .
                 $product->price . "\t" .
+                $product->harga_jual . "\t" .
                 ($product->category->name ?? 'N/A') . "\t" .
                 ($product->supplier->name ?? 'N/A') . "\t" .
                 $attributes . "\t" .

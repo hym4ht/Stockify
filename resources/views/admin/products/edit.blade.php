@@ -75,6 +75,15 @@
         </div>
 
         <div class="mb-4">
+            <label for="harga_jual" class="block text-gray-700 font-bold mb-2">Harga Jual</label>
+            <input type="number" name="harga_jual" id="harga_jual" value="{{ old('harga_jual', $product->harga_jual) }}" step="0.01" min="0" required
+                class="w-full border border-gray-300 rounded px-3 py-2 @error('harga_jual') border-red-500 @enderror" />
+            @error('harga_jual')
+            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div class="mb-4">
             <label for="stock" class="block text-gray-700 font-bold mb-2">Stock</label>
             <input type="number" name="stock" id="stock" value="{{ old('stock', $product->stock) }}" min="0" required
                 class="w-full border border-gray-300 rounded px-3 py-2 @error('stock') border-red-500 @enderror" />

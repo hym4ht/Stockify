@@ -1,11 +1,13 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\Category;
+
 class CalendarController extends Controller
 {
-public function index()
+    public function index()
     {
-        $categories = Calendar::paginate(15);
+        $categories = Category::paginate(15);
         return view('admin.categories.index', compact('categories'));
     }
 

@@ -6,6 +6,8 @@
         <div class="mb-4 flex space-x-2">
             <a href="{{ url('/admin/products/create') }}"
                 class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Create New Product</a>
+            <a href="{{ route('admin.products.import.form') }}"
+                class="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700">Import</a>
             <a href="{{ url('/admin/products/export') }}"
                 class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Export</a>
         </div>
@@ -21,9 +23,11 @@
                     <tr>
                         <th scope="col" class="px-6 py-4 font-medium text-gray-900 dark:text-white">Name</th>
                         <th scope="col" class="px-6 py-4 font-medium text-gray-900 dark:text-white">Price</th>
+                        <th scope="col" class="px-6 py-4 font-medium text-gray-900 dark:text-white">Harga Jual</th>
                         <th scope="col" class="px-6 py-4 font-medium text-gray-900 dark:text-white">Category</th>
                         <th scope="col" class="px-6 py-4 font-medium text-gray-900 dark:text-white">Supplier</th>
                         <th scope="col" class="px-6 py-4 font-medium text-gray-900 dark:text-white">Attributes</th>
+                            <th scope="col" class="px-6 py-4 font-medium text-gray-900 dark:text-white text-center">SKU</th>
                         <th scope="col" class="px-6 py-4 font-medium text-gray-900 dark:text-white text-center">Actions</th>
                     </tr>
                 </thead>
@@ -32,6 +36,7 @@
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-600">
                             <td class="px-6 py-4">{{ $product->name }}</td>
                             <td class="px-6 py-4">Rp {{ number_format($product->price, 2) }}</td>
+                            <td class="px-6 py-4">Rp {{ number_format($product->harga_jual, 2) }}</td>
                             <td class="px-6 py-4">{{ $product->category->name ?? 'N/A' }}</td>
                             <td class="px-6 py-4">{{ $product->supplier->name ?? 'N/A' }}</td>
                             <td class="px-6 py-4">
@@ -39,6 +44,7 @@
                                     <div>{{ $attribute->name }}: {{ $attribute->value }}</div>
                                 @endforeach
                             </td>
+                            <td class="px-6 py-4"> {{ $product->sku }}</td>
                             <td class="px-6 py-4 text-center">
                                 <a href="{{ route('admin.products.edit', $product->id) }}"
                                     class="text-blue-600 hover:underline mr-4">Edit</a>
@@ -53,7 +59,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No products found.
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No products found.
                             </td>
                         </tr>
                     @endforelse

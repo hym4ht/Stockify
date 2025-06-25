@@ -23,14 +23,10 @@
     <form action="{{ route('admin.products.import') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
         @csrf
         <div>
-            <label for="file" class="block font-medium mb-1">CSV File</label>
-            <input type="file" name="file" id="file" accept=".csv,text/csv" required class="border rounded p-2 w-full">
+            <label for="file" class="block font-medium mb-1">CSV or XLS File</label>
+            <input type="file" name="file" id="file" accept=".csv,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required class="border rounded p-2 w-full">
         </div>
         <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Import</button>
     </form>
-
-    <div class="mt-6">
-        <a href="{{ route('admin.products.export') }}" class="text-blue-600 hover:underline">Export Products as CSV</a>
-    </div>
 </div>
 @endsection
